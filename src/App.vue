@@ -102,6 +102,31 @@ return true
 </script>
 
 <template>
+<div class="mainGame w-screen h-screen bg-[url('/public/bg-main-menu.png')] bg-no-repeat bg-cover">
+
+<div class="grid grid-rows-2 grid-flow-col gap-4 font-sigmar">
+  <!-- Game Name -->
+  <div class="grid text-center mt-20 md:mt-36 drop-shadow-[0px_8px_0px_#FFEFBBFF]">
+    <span class="text-5xl md:text-7xl lg:text-8xl text-[#313638]">CHEESE</span>
+    <span class="text-3xl md:text-4xl lg:text-5xl text-[#313638]">KINGDOM</span>
+  </div>
+
+  <!-- Button Game  -->
+  <div class="flex flex-col items-center gap-3 mt-6 md:mt-8 ">
+    <button
+      class="bg-white rounded-lg text-lg md:text-xl lg:text-2xl shadow-md h-12 md:h-16 w-40 md:w-48 lg:w-56 text-green-600">
+      PLAY GAME
+    </button>
+    <button
+      class="bg-white rounded-lg text-lg md:text-xl lg:text-2xl shadow-md h-12 md:h-16 w-40 md:w-48 lg:w-56 text-slate-500">
+      HOW TO PLAY
+    </button>
+  </div>
+</div>
+</div>
+
+<!-- ------------------------------- -->
+
   <div>
     <div class="h-screen grid place-items-center">
       <div class="grid grid-cols-1 grid-rows-6 w-fit">
@@ -111,12 +136,12 @@ return true
             :key="cell.id"
             class="w-[75px] h-[75px] flex items-center justify-center border border-white"
             :class="[
-              !cell.isReveal ? 'bg-gray-800' : '',
-              cell.isReveal && cell.type === 'plate' ? 'bg-yellow-500' : '',
+              !cell.isReveal ? 'bg-gray-600' : '',
+              cell.isReveal && cell.type === 'plate' ? 'bg-orange-500' : '',
               cell.isReveal && cell.type === 'spring' ? 'bg-blue-500' : '',
               cell.isReveal && cell.type === 'bean' ? 'bg-red-500' : '',
               cell.isReveal && cell.type === 'cheese' ? 'bg-yellow-300' : '',
-              cell.isReveal && cell.type === 'mouse trap glue' ? 'bg-gray-600' : '',
+              cell.isReveal && cell.type === 'mouse trap glue' ? 'bg-pink-300' : '',
               cell.isReveal && cell.type === 'cat' ? 'bg-purple-500' : ''
             ]"
             @click="selectCell(rowIndex, cellIndex)"
@@ -139,4 +164,8 @@ return true
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.mainGame {
+  background-size: 100% 100%;
+}
+</style>
