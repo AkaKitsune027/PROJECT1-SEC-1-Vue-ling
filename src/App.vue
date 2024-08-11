@@ -26,13 +26,13 @@ function generateCards() {
         isReveal: false,
         pawn:
           r === 0 && c === 0
-            ? 'red'
+            ? 'ratking'
             : r === 0 && c === 1
-            ? 'red'
+            ? 'white'
             : r === 1 && c === 0
-            ? 'red'
+            ? 'white'
             : r === 5 && c === 5
-            ? 'black'
+            ? 'mouseking'
             : r === 5 && c === 4
             ? 'black'
             : r === 4 && c === 5
@@ -48,30 +48,6 @@ function generateCards() {
 
 const cards = ref(generateCards())
 
-/* const cards = ref(
-  Array.from({ length: 6 }, (_, rowIndex) =>
-    Array.from({ length: 6 }, (_, cellIndex) => ({
-      id: rowIndex * 6 + cellIndex + 1,
-      type: shuffledTypes.pop(), // นำ type จาก array shuffledTypes มาใช้
-      originalType: shuffledTypes.pop(), // เก็บ type ดั้งเดิมไว้เพื่อใช้งานในอนาคต
-      color: 'gray', // ตั้งค่าสีพื้นฐานเป็นสีเทา
-      pawn:
-        rowIndex === 0 && cellIndex === 0
-          ? 'red'
-          : rowIndex === 0 && cellIndex === 1
-          ? 'red'
-          : rowIndex === 1 && cellIndex === 0
-          ? 'red'
-          : rowIndex === 5 && cellIndex === 5
-          ? 'black'
-          : rowIndex === 5 && cellIndex === 4
-          ? 'black'
-          : rowIndex === 4 && cellIndex === 5
-          ? 'black'
-          : null
-    }))
-  )
-) */
 console.dir(cards.value)
 
 const selectedPawn = ref(null)
@@ -101,7 +77,7 @@ const movePawn = (rowIndex, cellIndex) => {
       setTimeout(() => {
         targetCard.pawn = fromerCard.pawn
         fromerCard.pawn = null // เคลื่อนย้ายหมากออกจากช่องเดิม
-      }, 300)
+      }, 150)
     }
   }
 }
@@ -113,8 +89,15 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   const isDiagonalMove = rowDiff === colDiff && (rowDiff === 1 || rowDiff === 2)
   const isStraightMove =
     (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)
+    if (!isDiagonalMove && !isStraightMove) return false
 
-  return isDiagonalMove || isStraightMove
+// ตรวจสอบว่าเป้าหมายมีหมากสีเดียวกันหรือไม่
+const targetCard = cards.value[rowTo][colTo]
+const fromCard = cards.value[rowFrom][colFrom]
+
+if (targetCard.pawn && targetCard.pawn === fromCard.pawn) return false
+
+return true
 }
 </script>
 
@@ -142,7 +125,11 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
               v-if="cell.pawn !== null"
               :class="[
                 'w-10 h-10 rounded-full',
-                cell.pawn === 'red' ? 'bg-red-500' : 'bg-black'
+                cell.pawn === 'ratking' ? 'bg-teal-500' : '',
+                cell.pawn === 'mouseking' ? 'bg-orange-500' : '',
+                cell.pawn === 'black' ? 'bg-black' : '',
+                cell.pawn === 'white' ? 'bg-white' : ''
+
               ]"
             ></div>
           </div>
