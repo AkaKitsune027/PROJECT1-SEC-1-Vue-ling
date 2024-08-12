@@ -26,13 +26,13 @@ function generateCards() {
         isReveal: false,
         pawn:
           r === 0 && c === 0
-            ? 'ratking'
+            ? 'white'
             : r === 0 && c === 1
               ? 'white'
               : r === 1 && c === 0
                 ? 'white'
                 : r === 5 && c === 5
-                  ? 'mouseking'
+                  ? 'black'
                   : r === 5 && c === 4
                     ? 'black'
                     : r === 4 && c === 5
@@ -86,24 +86,24 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   const rowDiff = Math.abs(rowFrom - rowTo)
   const colDiff = Math.abs(colFrom - colTo)
 
-  const isDiagonalMove = rowDiff === colDiff && (rowDiff === 1 || rowDiff === 2)
-  const isStraightMove =
-    (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)
-  if (!isDiagonalMove && !isStraightMove) return false
+  // ตรวจสอบการเดินทิศทางตรงหรือทแยงภายใน 1 ช่อง
+  const isValidDirection = (rowDiff <= 1 && colDiff <= 1)
 
   // ตรวจสอบว่าเป้าหมายมีหมากสีเดียวกันหรือไม่
   const targetCard = cards.value[rowTo][colTo]
   const fromCard = cards.value[rowFrom][colFrom]
 
+  // หมากสีเดียวกันห้ามเดินซ้อนกัน
   if (targetCard.pawn && targetCard.pawn === fromCard.pawn) return false
 
-  return true
+  // ตรวจสอบว่าทิศทางการเดินถูกต้องหรือไม่
+  return isValidDirection
 }
 </script>
 
 <template>
   <div>
-    <div class="text-4xl absolute text-center w-screen top-16">Cheese Kingdom</div>
+    <div class="text-4xl absolute text-center w-screen top-16 text-slate-50">Cheese Kingdom</div>
     <div class="h-screen grid place-items-center grid-cols-4">
       <!-- UI mouse -->
       <div class="col-start-1">
@@ -123,10 +123,10 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
         </div>
       </div>
 
-      <div class="grid grid-cols-1 grid-rows-6 w-fit col-start-2 col-span-2">
-        <div v-for="(row, rowIndex) in cards" :key="rowIndex" class="grid grid-cols-6 grid-rows-1">
+      <div class="grid grid-cols-1 grid-rows-6 w-fit col-start-2 col-span-2 gap-2 bg-[#E0DFD5] bg-opacity-30">
+        <div v-for="(row, rowIndex) in cards" :key="rowIndex" class="grid grid-cols-6 grid-rows-1 gap-2">
           <div v-for="(cell, cellIndex) in row" :key="cell.id"
-            class="w-[75px] h-[75px] flex items-center justify-center border border-white" :class="[
+            class="w-[95px] h-[95px] flex items-center justify-center border-2 border-white" :class="[
               !cell.isReveal ? 'bg-gray-800' : '',
               cell.isReveal && cell.type === 'plate' ? 'bg-yellow-500' : '',
               cell.isReveal && cell.type === 'spring' ? 'bg-blue-500' : '',
