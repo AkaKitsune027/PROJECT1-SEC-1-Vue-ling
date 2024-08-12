@@ -135,17 +135,17 @@ const startGame = () => {
       <div class="h-screen grid place-items-center grid-cols-4">
         <!-- UI mouse -->
         <div class="col-start-1">
-          <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3">
+          <img src="/public//gray_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3">
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div>
               <div class="flex justify-center my-3 gap-2">
-                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
-                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
+                <img src="/public/gray_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
+                <img src="/public/gray_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/public/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/public/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/public/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl">
               </div>
             </div>
           </div>
@@ -177,17 +177,17 @@ const startGame = () => {
         </div>
         <!-- UI mouse -->
         <div class="col-start-4">
-          <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3" alt="greyKemMouse">
+          <img src="/public/gray_kem_mouse.png" class="rounded-lg w-56 h-56 my-3" alt="greyKemMouse">
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div>
               <div class="flex justify-center my-3 gap-2">
-                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
-                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
+                <img src="/public/gray_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
+                <img src="/public/gray_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/public/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/public/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/public/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl">
               </div>
             </div>
           </div>
