@@ -1,3 +1,4 @@
+card cat
 <script setup>
 import { ref } from 'vue'
 
@@ -67,24 +68,36 @@ const selectCell = (rowIndex, cellIndex) => {
 }
 
 const movePawn = (rowIndex, cellIndex) => {
+
   const { row, col } = selectedPawn.value
   if (isValidMove(row, col, rowIndex, cellIndex)) {
     const targetCard = cards.value[rowIndex][cellIndex]
     const fromCard = cards.value[row][col]
-
+    // ถ้าช่องเป้าหมายเปิดเผยแล้ว
     if (targetCard.isReveal) {
-      targetCard.pawn = fromCard.pawn
-      fromCard.pawn = null // เคลื่อนย้ายหมากออกจากช่องเดิม
+      // ถ้าช่องเป้าหมายเป็นแมว
+      if (targetCard.type === 'cat') {
+        fromCard.pawn = null; // ทำให้หมากหายไป
+      } else {
+        targetCard.pawn = fromCard.pawn;
+        fromCard.pawn = null; // เคลื่อนย้ายหมาก
+      }
     } else {
-      targetCard.isReveal = true
+      // ถ้าช่องเป้าหมายยังไม่เปิดเผย
+      targetCard.isReveal = true;
       setTimeout(() => {
-        targetCard.pawn = fromCard.pawn
-        fromCard.pawn = null // เคลื่อนย้ายหมากออกจากช่องเดิม
-      }, 325)
+        if (targetCard.type === 'cat') {
+          fromCard.pawn = null; // ทำให้หมากหายไป
+        } else {
+          targetCard.pawn = fromCard.pawn;
+          fromCard.pawn = null; // เคลื่อนย้ายหมาก
+        }
+      }, 325);
     }
     switchTurn()
   }
 }
+
 
 const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   const rowDiff = Math.abs(rowFrom - rowTo)
@@ -102,6 +115,9 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
 
   // ตรวจสอบว่าทิศทางการเดินถูกต้องหรือไม่
   return isValidDirection
+
+  // การ์ดแมว เหมียวๆ
+
 }
 
 const switchTurn = () => {
@@ -212,8 +228,6 @@ const switchTurn = () => {
             cell.pawn === 'white-king' ? 'bg-[url(/king_light-gray.png)]' : '',
             cell.pawn === 'black' ? 'bg-[url(/soldier_dark-gray.png)]' : '',
             cell.pawn === 'white' ? 'bg-[url(/soldier_ligth-gray.png)]' : ''
-            
-
           ]"></div>
         </div>
 
