@@ -53,6 +53,7 @@ const cards = ref(generateCards())
 console.dir(cards.value)
 
 const selectedPawn = ref(null)
+const currentPlayer = ref('white')
 
 const selectCell = (rowIndex, cellIndex) => {
   if (selectedPawn.value === null) {
@@ -81,6 +82,7 @@ const movePawn = (rowIndex, cellIndex) => {
         fromerCard.pawn = null // เคลื่อนย้ายหมากออกจากช่องเดิม
       }, 150)
     }
+    switchTurn()
   }
 }
 
@@ -101,6 +103,38 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   // ตรวจสอบว่าทิศทางการเดินถูกต้องหรือไม่
   return isValidDirection
 }
+
+const switchTurn = () => {
+  currentPlayer.value = currentPlayer.value === 'white' ? 'black' : 'white'
+  console.log(`It's now ${currentPlayer.value}'s turn.`)
+}
+
+// function switchTurn() {
+//   // Toggle between 'white' and 'black'
+//   currentPlayer.value = currentPlayer.value === 'white' ? 'black' : 'white'
+//   console.log(`It's now ${currentPlayer.value}'s turn.`)
+// }
+
+// function switchTurn() {
+//   const currentPlayer = ref(1)
+//   if (cards.type == 'cat' || 'plate' || 'mouse-trap-glue') {
+//     currentPlayer.value = currentPlayer.value === 1 ? 2 : 1
+//     console.log('end')
+
+//   //   setTimeout(() => {
+//   //     console.log(`Player number ${currentPlayer.value}'s turn.`)
+//   //   }, 2000);
+//   } else if (cards.type == 'spring' || 'bean') {
+//     console.log('choose another move')
+//     handleCardClick()
+//   } else if (cards.type == 'cheddar-cheese', 'gouda-cheese', 'swiss-cheese') {
+//     chessePower()
+//     // if (items.hasMouse == 'true') {
+//     //   console.log('wait for the king.')
+
+//     // }
+//   }
+// }
 </script>
 
 <template>
