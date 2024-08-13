@@ -28,13 +28,13 @@ function generateCards() {
         isReveal: false,
         pawn:
           r === 0 && c === 0
-            ? 'white'
+            ? 'white-king'
             : r === 0 && c === 1
               ? 'white'
               : r === 1 && c === 0
                 ? 'white'
                 : r === 5 && c === 5
-                  ? 'black'
+                  ? 'black-king'
                   : r === 5 && c === 4
                     ? 'black'
                     : r === 4 && c === 5
@@ -70,17 +70,17 @@ const movePawn = (rowIndex, cellIndex) => {
   const { row, col } = selectedPawn.value
   if (isValidMove(row, col, rowIndex, cellIndex)) {
     const targetCard = cards.value[rowIndex][cellIndex]
-    const fromerCard = cards.value[row][col]
+    const fromCard = cards.value[row][col]
 
     if (targetCard.isReveal) {
-      targetCard.pawn = fromerCard.pawn
-      fromerCard.pawn = null // เคลื่อนย้ายหมากออกจากช่องเดิม
+      targetCard.pawn = fromCard.pawn
+      fromCard.pawn = null // เคลื่อนย้ายหมากออกจากช่องเดิม
     } else {
       targetCard.isReveal = true
       setTimeout(() => {
-        targetCard.pawn = fromerCard.pawn
-        fromerCard.pawn = null // เคลื่อนย้ายหมากออกจากช่องเดิม
-      }, 150)
+        targetCard.pawn = fromCard.pawn
+        fromCard.pawn = null // เคลื่อนย้ายหมากออกจากช่องเดิม
+      }, 325)
     }
     switchTurn()
   }
@@ -169,7 +169,8 @@ const switchTurn = () => {
   </div>
 
   <div class="flex justify-center items-end h-24 text-5xl w-screen text-slate-50 font-sigmar">Cheese Kingdom</div>
-
+  <div class="text-center text-2xl font-bold text-white mb-4">
+  Current Player: {{ currentPlayer }}</div><!--แสดง turn-->
   <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
     <!-- UI mouse display rigth -->
     <div class="col-start-1">
@@ -194,7 +195,7 @@ const switchTurn = () => {
     <div class="grid grid-cols-1 grid-rows-6 w-fit col-start-2 col-span-2 gap-2 bg-[#E0DFD5] bg-opacity-30">
       <div v-for="(row, rowIndex) in cards" :key="rowIndex" class="grid grid-cols-6 grid-rows-1 gap-2">
         <div v-for="(cell, cellIndex) in row" :key="cell.id"
-          class="w-[95px] h-[95px] flex items-center justify-center border-2 border-white bg-cover" :class="[
+          class="w-[95px] h-[95px] flex items-center justify-center border-2 border-white bg-cover hover:border-green-500" :class="[
             !cell.isReveal ? 'bg-gray-800' : '',
             cell.isReveal && cell.type === 'plate' ? 'bg-[url(/plate.png)]' : '',
             cell.isReveal && cell.type === 'spring' ? 'bg-[url(/grey-coil-spring.png)]' : '',
@@ -206,11 +207,12 @@ const switchTurn = () => {
             cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : ''
           ]" @click="selectCell(rowIndex, cellIndex)">
           <div v-if="cell.pawn !== null" :class="[
-            'w-10 h-10 rounded-full',
-            cell.pawn === 'ratking' ? 'bg-teal-500' : '',
-            cell.pawn === 'mouseking' ? 'bg-orange-500' : '',
-            cell.pawn === 'black' ? 'bg-black' : '',
-            cell.pawn === 'white' ? 'bg-white' : ''
+            'w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500',
+            cell.pawn === 'black-king' ? 'bg-[url(/king_dark-gray.png)]' : '',
+            cell.pawn === 'white-king' ? 'bg-[url(/king_light-gray.png)]' : '',
+            cell.pawn === 'black' ? 'bg-[url(/soldier_dark-gray.png)]' : '',
+            cell.pawn === 'white' ? 'bg-[url(/soldier_ligth-gray.png)]' : ''
+            
 
           ]"></div>
         </div>
