@@ -1,4 +1,5 @@
 import daisyui from 'daisyui';
+const { fontFamily } = require('tailwindcss/defaultTheme')
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -8,6 +9,12 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sigmar: [
+          '"Sigmar one"',
+          ...fontFamily.sans,
+        ],
+      },
     },
     plugins: [daisyui],
   }
