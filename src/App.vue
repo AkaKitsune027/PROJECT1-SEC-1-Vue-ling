@@ -1,138 +1,3 @@
-<!-- <script setup>
-import { ref } from 'vue'
-
-const currentPage = ref('home')
-
-const typesArray = [
-  ...Array(10).fill('plate'),
-  ...Array(7).fill('spring'),
-  ...Array(6).fill('bean'),
-  ...Array(2).fill('cheddar-cheese'),
-  ...Array(2).fill('gouda-cheese'),
-  ...Array(2).fill('swiss-cheese'),
-  ...Array(4).fill('mouse-trap-glue'),
-  ...Array(3).fill('cat')
-]
-
-// สุ่มตำแหน่งของ elements ใน array
-const shuffledTypes = typesArray.sort(() => Math.random() - 0.5)
-
-function generateCards() {
-  const result = []
-
-  for (let r = 0; r < 6; r++) {
-    const row = []
-
-    for (let c = 0; c < 6; c++) {
-      row.push({
-        id: r * 6 + c + 1,
-        type: shuffledTypes.pop(), // นำ type จาก array shuffledTypes มาใช้
-        isReveal: false,
-        pawn:
-          r === 0 && c === 0
-            ? 'white-king'
-            : r === 0 && c === 1
-              ? 'white'
-              : r === 1 && c === 0
-                ? 'white'
-                : r === 5 && c === 5
-                  ? 'black-king'
-                  : r === 5 && c === 4
-                    ? 'black'
-                    : r === 4 && c === 5
-                      ? 'black'
-                      : null
-      })
-    }
-
-    result.push(row)
-  }
-  return result
-}
-
-const cards = ref(generateCards())
-
-console.dir(cards.value)
-
-const selectedPawn = ref(null)
-const currentPlayer = ref('white')
-
-const selectCell = (rowIndex, cellIndex) => {
-  if (selectedPawn.value === null) {
-    if (cards.value[rowIndex][cellIndex].pawn !== null) {
-      selectedPawn.value = { row: rowIndex, col: cellIndex }
-    }
-  } else {
-    movePawn(rowIndex, cellIndex)
-    selectedPawn.value = null
-  }
-}
-
-const movePawn = (rowIndex, cellIndex) => {
-
-  const { row, col } = selectedPawn.value
-  if (isValidMove(row, col, rowIndex, cellIndex)) {
-    const targetCard = cards.value[rowIndex][cellIndex]
-    const fromCard = cards.value[row][col]
-    // ถ้าช่องเป้าหมายเปิดเผยแล้ว
-    if (targetCard.isReveal) {
-      // ถ้าช่องเป้าหมายเป็นแมว
-      if (targetCard.type === 'cat') {
-        fromCard.pawn = null; // ทำให้หมากหายไป
-      } else {
-        targetCard.pawn = fromCard.pawn;
-        fromCard.pawn = null; // เคลื่อนย้ายหมาก
-      }
-    } else {
-      // ถ้าช่องเป้าหมายยังไม่เปิดเผย
-      targetCard.isReveal = true;
-      setTimeout(() => {
-        if (targetCard.type === 'cat') {
-          fromCard.pawn = null; // ทำให้หมากหายไป
-        } else {
-          targetCard.pawn = fromCard.pawn;
-          fromCard.pawn = null; // เคลื่อนย้ายหมาก
-        }
-      }, 325);
-    }
-    switchTurn()
-  }
-  
-}
-
-
-const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
-  const rowDiff = Math.abs(rowFrom - rowTo)
-  const colDiff = Math.abs(colFrom - colTo)
-
-  // ตรวจสอบการเดินทิศทางตรงหรือทแยงภายใน 1 ช่อง
-  const isValidDirection = (rowDiff <= 1 && colDiff <= 1)
-
-  // ตรวจสอบว่าเป้าหมายมีหมากสีเดียวกันหรือไม่
-  const targetCard = cards.value[rowTo][colTo]
-  const fromCard = cards.value[rowFrom][colFrom]
-
-  // หมากสีเดียวกันห้ามเดินซ้อนกัน
-  if (targetCard.pawn && targetCard.pawn === fromCard.pawn) return false
-
-  // ตรวจสอบว่าทิศทางการเดินถูกต้องหรือไม่
-  return isValidDirection
-
-  // การ์ดแมว เหมียวๆ
-
-}
-
-const switchTurn = () => {
-  currentPlayer.value = currentPlayer.value === 'white' ? 'black' : 'white'
-  console.log(`It's now ${currentPlayer.value}'s turn.`)
-}
-
-const startGame = () => {
-  currentPage.value = 'game' // เมื่อกดปุ่ม play game จะเปลี่ยนไปที่หน้า game
-}
-
-
-</script> -->
 <script setup>
 import { ref } from 'vue'
 
@@ -218,25 +83,25 @@ const movePawn = (rowIndex, cellIndex) => {
 
     if (targetCard.isReveal) {
       if (targetCard.type === 'cat') {
-        fromCard.pawn = null // ทำให้หมากหายไป
+        fromCard.pawn = null 
       } else {
         targetCard.pawn = fromCard.pawn
-        fromCard.pawn = null // เคลื่อนย้ายหมาก
+        fromCard.pawn = null 
       }
     } else {
       targetCard.isReveal = true
       setTimeout(() => {
         if (targetCard.type === 'cat') {
-          fromCard.pawn = null // ทำให้หมากหายไป
+          fromCard.pawn = null 
         } else {
           targetCard.pawn = fromCard.pawn
-          fromCard.pawn = null // เคลื่อนย้ายหมาก
+          fromCard.pawn = null 
         }
       }, 325)
     }
 
     if (targetCard.type === 'spring') {
-      // ถ้าเจอการ์ด spring ให้เลือกเคลื่อนที่อีกรอบ
+      
       isSpringActive.value = true
       springPawnPosition.value = { row: rowIndex, col: cellIndex }
     } else {
