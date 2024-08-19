@@ -1,4 +1,3 @@
-card cat
 <script setup>
 import { ref } from 'vue'
 
@@ -59,6 +58,15 @@ const selectedPawn = ref(null)
 const currentPlayer = ref('white')
 
 const selectCell = (rowIndex, cellIndex) => {
+  const selectedCard = cards.value[rowIndex][cellIndex]
+
+  if (
+    (currentPlayer.value === 'white' && selectedCard.pawn?.includes('black')) ||
+    (currentPlayer.value === 'black' && selectedCard.pawn?.includes('white'))
+  ) {
+    return
+  }
+
   if (selectedPawn.value === null) {
     if (cards.value[rowIndex][cellIndex].pawn !== null) {
       selectedPawn.value = { row: rowIndex, col: cellIndex }
@@ -100,7 +108,6 @@ const movePawn = (rowIndex, cellIndex) => {
   }
 }
 
-
 const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   const rowDiff = Math.abs(rowFrom - rowTo)
   const colDiff = Math.abs(colFrom - colTo)
@@ -122,41 +129,23 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
 
 }
 
+// const switchTurn = () => {
+//   currentPlayer.value = currentPlayer.value === 'white' ? 'black' : 'white'
+//   console.log(`It's now ${currentPlayer.value}'s turn.`)
+// }
+
 const switchTurn = () => {
-  currentPlayer.value = currentPlayer.value === 'white' ? 'black' : 'white'
+  if (currentPlayer.value === 'white') {
+    currentPlayer.value = 'black'
+  } else {
+    currentPlayer.value = 'white'
+  }
   console.log(`It's now ${currentPlayer.value}'s turn.`)
 }
 
 const startGame = () => {
   currentPage.value = 'game' // เมื่อกดปุ่ม play game จะเปลี่ยนไปที่หน้า game
 }
-
-// function switchTurn() {
-//   // Toggle between 'white' and 'black'
-//   currentPlayer.value = currentPlayer.value === 'white' ? 'black' : 'white'
-//   console.log(`It's now ${currentPlayer.value}'s turn.`)
-// }
-
-// function switchTurn() {
-//   const currentPlayer = ref(1)
-//   if (cards.type == 'cat' || 'plate' || 'mouse-trap-glue') {
-//     currentPlayer.value = currentPlayer.value === 1 ? 2 : 1
-//     console.log('end')
-
-//   //   setTimeout(() => {
-//   //     console.log(`Player number ${currentPlayer.value}'s turn.`)
-//   //   }, 2000);
-//   } else if (cards.type == 'spring' || 'bean') {
-//     console.log('choose another move')
-//     handleCardClick()
-//   } else if (cards.type == 'cheddar-cheese', 'gouda-cheese', 'swiss-cheese') {
-//     chessePower()
-//     // if (items.hasMouse == 'true') {
-//     //   console.log('wait for the king.')
-
-//     // }
-//   }
-// }
 </script>
 
 <template>
