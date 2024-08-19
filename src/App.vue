@@ -161,7 +161,7 @@ const movePawn = (rowIndex, cellIndex) => {
     const targetCard = cards.value[rowIndex][cellIndex]
     const fromCard = cards.value[row][col]
     // ถ้าช่องเป้าหมายเปิดเผยแล้ว
-    if (targetCard.isReveal) 
+    if (targetCard.isReveal) {
       doCardEvent(targetCard, fromCard)
       targetCard.pawn = fromCard.pawn;
       fromCard.pawn = null;
