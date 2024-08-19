@@ -82,6 +82,10 @@ const totalBlackPawns = computed(() => {
 const selectedPawn = ref(null)
 const currentPlayer = ref('white')
 
+const canMoveAgain = ref(false);
+
+
+
 const selectCell = (rowIndex, cellIndex) => {
   const selectedCard = cards.value[rowIndex][cellIndex]
 
@@ -121,7 +125,7 @@ const doCardEvent = (targetCard, fromCard) => {
   if (targetCard.type === 'cat') {
     fromCard.pawn = null; // ทำให้หมากหายไป
   } else if (targetCard.type === 'spring') {
-    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+    canMoveAgain.value = true; // ตั้งค่าสถานะให้สามารถเดินได้อีกครั้ง
   } else if (targetCard.type === 'bean') {
     // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
   } else if (targetCard.type === 'mouse-trap-glue') {
@@ -155,29 +159,35 @@ const updatePlateCards = () => {
 
 
 const movePawn = (rowIndex, cellIndex) => {
-
-  const { row, col } = selectedPawn.value
+  const { row, col } = selectedPawn.value;
   if (isValidMove(row, col, rowIndex, cellIndex)) {
-    const targetCard = cards.value[rowIndex][cellIndex]
-    const fromCard = cards.value[row][col]
+    const targetCard = cards.value[rowIndex][cellIndex];
+    const fromCard = cards.value[row][col];
     // ถ้าช่องเป้าหมายเปิดเผยแล้ว
     if (targetCard.isReveal) {
-      doCardEvent(targetCard, fromCard)
+      doCardEvent(targetCard, fromCard);
       targetCard.pawn = fromCard.pawn;
       fromCard.pawn = null;
     } else {
       // ถ้าช่องเป้าหมายยังไม่เปิดเผย
-      doCardEvent(targetCard, fromCard)
+      doCardEvent(targetCard, fromCard);
       targetCard.isReveal = true;
 
-      setTimeout(() => {       
-          targetCard.pawn = fromCard.pawn;
-          fromCard.pawn = null; // เคลื่อนย้ายหมาก       
+      setTimeout(() => {
+        targetCard.pawn = fromCard.pawn;
+        fromCard.pawn = null; // เคลื่อนย้ายหมาก
       }, 325);
     }
-    switchTurn()
+    // ตรวจสอบว่าเราต้องเปลี่ยนเทิร์นหรือไม่
+    if (canMoveAgain.value) {
+      // ตั้งค่าสถานะเป็น false หลังจากให้เดินอีกครั้ง
+      canMoveAgain.value = false;
+    } else {
+      switchTurn();
+    }
   }
 }
+
 
 const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   const rowDiff = Math.abs(rowFrom - rowTo)
