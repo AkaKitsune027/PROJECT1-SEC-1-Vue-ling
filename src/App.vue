@@ -250,8 +250,8 @@ const startGame = () => {
         <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
           <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
-            <div>
-              <div class="flex justify-center items-center my-3 gap-2 font-bold text-white text-3xl">
+            <div class="flex flex-col space-y-4">
+              <div class="flex justify-center items-center  gap-2 font-bold text-white text-3xl">
                 <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl"> 
                 <span class="text-outline">x {{ totalWhitePawns }}</span>
               </div>
@@ -294,8 +294,8 @@ const startGame = () => {
         <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
-            <div>
-              <div class="flex justify-center items-center my-3 gap-2 font-bold text-white text-3xl">
+            <div class="flex flex-col space-y-4">
+              <div class="flex justify-center items-center gap-2 font-bold text-white text-3xl">
                 <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl"> 
                 <span class="text-outline">x {{ totalBlackPawns }}</span>
               </div>
