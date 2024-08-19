@@ -81,8 +81,8 @@ const totalBlackPawns = computed(() => {
 
 const selectedPawn = ref(null)
 const currentPlayer = ref('white')
-
-const canMoveAgain = ref(false);
+const canMoveAgain = ref(false)
+const disabledPawn = ref(false)
 
 
 
@@ -123,18 +123,34 @@ const selectCell = (rowIndex, cellIndex) => {
 
 const doCardEvent = (targetCard, fromCard) => {
   if (targetCard.type === 'cat') {
-    fromCard.pawn = null; // ทำให้หมากหายไป
+    fromCard.pawn = null // ทำให้หมากหายไป
   } else if (targetCard.type === 'spring') {
-    canMoveAgain.value = true; // ตั้งค่าสถานะให้สามารถเดินได้อีกครั้ง
+    canMoveAgain.value = true // ตั้งค่าสถานะให้สามารถเดินได้อีกครั้ง
   } else if (targetCard.type === 'bean') {
-    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+    console.log('bean coming !')
+    const flattenCards = []
+    for (const row of cards.value) {
+      flattenCards.push(...row)
+    }
+    const friendCards = flattenCards.filter((card) => {
+      return card.pawn?.includes(fromCard.pawn.split('-')[0]) && card.id !== fromCard.id
+    }).map((card) => card.id)
+
+    if (friendCards.length > 1) {
+      console.dir(friendCards)
+      console.log(fromCard);
+      canMoveAgain.value = true
+      // disabledPawn.value = true
+
+    } else return
+
   } else if (targetCard.type === 'mouse-trap-glue') {
     // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
   } else if (targetCard.type === 'cheddar-cheese' || targetCard.type === 'gouda-cheese' || targetCard.type === 'swiss-cheese') {
     if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
       const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
       updatePlateCards() // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
-      
+
       const newPawnPosition = Math.round(Math.random() * plateCards.value.length)
       console.log(plateCards.value);
 
@@ -143,7 +159,7 @@ const doCardEvent = (targetCard, fromCard) => {
   } else if (targetCard.type === 'plate') {
     // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
   }
-} 
+}
 
 const plateCards = ref([])
 const updatePlateCards = () => {
@@ -151,7 +167,7 @@ const updatePlateCards = () => {
   for (const row of cards.value) {
     for (const card of row) {
       if (card.isReveal && card.type === 'plate' && !card.pawn) {
-        plateCards.value.push(card) 
+        plateCards.value.push(card)
       }
     }
   }
@@ -284,7 +300,7 @@ const startGame = () => {
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center  gap-2 font-bold text-white text-3xl">
-                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl"> 
+                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
                 <span class="text-outline">x {{ totalWhitePawns }}</span>
               </div>
               <div class="flex justify-center gap-2">
@@ -328,7 +344,7 @@ const startGame = () => {
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center gap-2 font-bold text-white text-3xl">
-                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl"> 
+                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
                 <span class="text-outline">x {{ totalBlackPawns }}</span>
               </div>
               <div class="flex justify-center gap-2">
