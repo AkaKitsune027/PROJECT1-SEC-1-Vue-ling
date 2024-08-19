@@ -44,7 +44,6 @@ function generateCards() {
                       : null
       })
     }
-
     result.push(row)
   }
   return result
@@ -77,6 +76,43 @@ const selectCell = (rowIndex, cellIndex) => {
   }
 }
 
+const doCardEvent = (targetCard, fromCard) => {
+  if (targetCard.type === 'cat') {
+    fromCard.pawn = null; // ทำให้หมากหายไป
+  } else if (targetCard.type === 'spring') {
+    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+  } else if (targetCard.type === 'bean') {
+    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+  } else if (targetCard.type === 'mouse-trap-glue') {
+    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+  } else if (targetCard.type === 'cheddar-cheese' || targetCard.type === 'gouda-cheese' || targetCard.type === 'swiss-cheese') {
+    if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
+      const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
+      updatePlateCards() // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
+      
+      const newPawnPosition = Math.round(Math.random() * plateCards.value.length)
+      console.log(plateCards.value);
+
+      plateCards.value[newPawnPosition].pawn = newPawn
+    }
+  } else if (targetCard.type === 'plate') {
+    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+  }
+} 
+
+const plateCards = ref([])
+const updatePlateCards = () => {
+  plateCards.value = []
+  for (const row of cards.value) {
+    for (const card of row) {
+      if (card.isReveal && card.type === 'plate' && !card.pawn) {
+        plateCards.value.push(card) 
+      }
+    }
+  }
+}
+
+
 const movePawn = (rowIndex, cellIndex) => {
 
   const { row, col } = selectedPawn.value
@@ -86,22 +122,17 @@ const movePawn = (rowIndex, cellIndex) => {
     // ถ้าช่องเป้าหมายเปิดเผยแล้ว
     if (targetCard.isReveal) {
       // ถ้าช่องเป้าหมายเป็นแมว
-      if (targetCard.type === 'cat') {
-        fromCard.pawn = null; // ทำให้หมากหายไป
-      } else {
-        targetCard.pawn = fromCard.pawn;
-        fromCard.pawn = null; // เคลื่อนย้ายหมาก
-      }
+      doCardEvent(targetCard, fromCard)
+      targetCard.pawn = fromCard.pawn;
+      fromCard.pawn = null;
     } else {
       // ถ้าช่องเป้าหมายยังไม่เปิดเผย
+      doCardEvent(targetCard, fromCard)
       targetCard.isReveal = true;
-      setTimeout(() => {
-        if (targetCard.type === 'cat') {
-          fromCard.pawn = null; // ทำให้หมากหายไป
-        } else {
+
+      setTimeout(() => {       
           targetCard.pawn = fromCard.pawn;
-          fromCard.pawn = null; // เคลื่อนย้ายหมาก
-        }
+          fromCard.pawn = null; // เคลื่อนย้ายหมาก       
       }, 325);
     }
     switchTurn()
@@ -120,7 +151,7 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   const fromCard = cards.value[rowFrom][colFrom]
 
   // หมากสีเดียวกันห้ามเดินซ้อนกัน
-  if (targetCard.pawn && targetCard.pawn === fromCard.pawn) return false
+  if (targetCard.pawn && targetCard.pawn.split('-')[0] === fromCard.pawn.split('-')[0]) return false
 
   // ตรวจสอบว่าทิศทางการเดินถูกต้องหรือไม่
   return isValidDirection
