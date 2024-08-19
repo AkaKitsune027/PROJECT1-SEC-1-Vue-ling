@@ -45,7 +45,6 @@ function generateCards() {
                       : null
       })
     }
-
     result.push(row)
   }
   return result
@@ -84,15 +83,76 @@ const selectedPawn = ref(null)
 const currentPlayer = ref('white')
 
 const selectCell = (rowIndex, cellIndex) => {
+  const selectedCard = cards.value[rowIndex][cellIndex]
+
+  // ถ้ายังไม่มีหมากที่ถูกเลือกไว้ก่อนหน้านี้
   if (selectedPawn.value === null) {
-    if (cards.value[rowIndex][cellIndex].pawn !== null) {
-      selectedPawn.value = { row: rowIndex, col: cellIndex }
+    // ถ้าตำแหน่งที่คลิกมีหมากอยู่ (ไม่ว่าจะเป็นฝ่ายใด)
+    if (selectedCard.pawn !== null) {
+      // ตรวจสอบว่าผู้เล่นคลิกที่หมากของตัวเองหรือไม่
+      if (
+        (currentPlayer.value === 'white' && selectedCard.pawn.includes('white')) ||
+        (currentPlayer.value === 'black' && selectedCard.pawn.includes('black'))
+      ) {
+        selectedPawn.value = { row: rowIndex, col: cellIndex }
+      }
     }
-  } else {
-    movePawn(rowIndex, cellIndex)
+  }
+  // เมื่อเลือกหมากแล้ว ให้ทำการย้ายหมากหรือกินหมาก
+  else {
+    // ตรวจสอบว่าตำแหน่งปลายทางมีหมากของฝ่ายตรงข้ามหรือไม่
+    if (
+      (currentPlayer.value === 'white' && selectedCard.pawn?.includes('black')) ||
+      (currentPlayer.value === 'black' && selectedCard.pawn?.includes('white'))
+    ) {
+      // ทำการกินหมากฝ่ายตรงข้าม โดยการเคลื่อนหมากของผู้เล่นไปยังตำแหน่งนั้น
+      movePawn(rowIndex, cellIndex)
+    } else if (selectedCard.pawn === null) {
+      // ถ้าตำแหน่งปลายทางไม่มีหมากอยู่ (เป็นการย้ายหมากธรรมดา)
+      movePawn(rowIndex, cellIndex)
+    }
+
+    // รีเซ็ตตัวแปร selectedPawn หลังจากย้ายหรือกินหมากเสร็จแล้ว
     selectedPawn.value = null
   }
 }
+
+const doCardEvent = (targetCard, fromCard) => {
+  if (targetCard.type === 'cat') {
+    fromCard.pawn = null; // ทำให้หมากหายไป
+  } else if (targetCard.type === 'spring') {
+    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+  } else if (targetCard.type === 'bean') {
+    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+  } else if (targetCard.type === 'mouse-trap-glue') {
+    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+  } else if (targetCard.type === 'cheddar-cheese' || targetCard.type === 'gouda-cheese' || targetCard.type === 'swiss-cheese') {
+    if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
+      const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
+      updatePlateCards() // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
+      
+      const newPawnPosition = Math.round(Math.random() * plateCards.value.length)
+      console.log(plateCards.value);
+
+      plateCards.value[newPawnPosition].pawn = newPawn
+    }
+  } else if (targetCard.type === 'plate') {
+    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+  }
+} 
+
+const plateCards = ref([])
+const updatePlateCards = () => {
+  plateCards.value = []
+  for (const row of cards.value) {
+    for (const card of row) {
+      if (card.isReveal && card.type === 'plate' && !card.pawn) {
+        plateCards.value.push(card) 
+      }
+    }
+  }
+}
+
 
 const movePawn = (rowIndex, cellIndex) => {
 
@@ -101,35 +161,23 @@ const movePawn = (rowIndex, cellIndex) => {
     const targetCard = cards.value[rowIndex][cellIndex]
     const fromCard = cards.value[row][col]
     // ถ้าช่องเป้าหมายเปิดเผยแล้ว
-    if (targetCard.isReveal) {
-      // ถ้าช่องเป้าหมายเป็นแมว
-      if (targetCard.type === 'cat') {
-        fromCard.pawn = null; // ทำให้หมากหายไป
-        if(currentPlayer.value === 'white') {
-       whiteCatCaptured.value = true; // เปลี่ยนเป็นขาวดำฝั่งสีขาว
-        } else {
-          blackCatCaptured.value = true; // เปลี่ยนเป็นขาวดำฝั่งสีดำ
-        }
-      } else {
-        targetCard.pawn = fromCard.pawn;
-        fromCard.pawn = null; // เคลื่อนย้ายหมาก
-      }
+    if (targetCard.isReveal) 
+      doCardEvent(targetCard, fromCard)
+      targetCard.pawn = fromCard.pawn;
+      fromCard.pawn = null;
     } else {
       // ถ้าช่องเป้าหมายยังไม่เปิดเผย
+      doCardEvent(targetCard, fromCard)
       targetCard.isReveal = true;
-      setTimeout(() => {
-        if (targetCard.type === 'cat') {
-          fromCard.pawn = null; // ทำให้หมากหายไป
-        } else {
+
+      setTimeout(() => {       
           targetCard.pawn = fromCard.pawn;
-          fromCard.pawn = null; // เคลื่อนย้ายหมาก
-        }
+          fromCard.pawn = null; // เคลื่อนย้ายหมาก       
       }, 325);
     }
     switchTurn()
   }
 }
-
 
 const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   const rowDiff = Math.abs(rowFrom - rowTo)
@@ -143,50 +191,24 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
   const fromCard = cards.value[rowFrom][colFrom]
 
   // หมากสีเดียวกันห้ามเดินซ้อนกัน
-  if (targetCard.pawn && targetCard.pawn === fromCard.pawn) return false
+  if (targetCard.pawn && targetCard.pawn.split('-')[0] === fromCard.pawn.split('-')[0]) return false
 
   // ตรวจสอบว่าทิศทางการเดินถูกต้องหรือไม่
   return isValidDirection
-
-  // การ์ดแมว เหมียวๆ
-
 }
 
 const switchTurn = () => {
-  currentPlayer.value = currentPlayer.value === 'white' ? 'black' : 'white'
+  if (currentPlayer.value === 'white') {
+    currentPlayer.value = 'black'
+  } else {
+    currentPlayer.value = 'white'
+  }
   console.log(`It's now ${currentPlayer.value}'s turn.`)
 }
 
 const startGame = () => {
   currentPage.value = 'game' // เมื่อกดปุ่ม play game จะเปลี่ยนไปที่หน้า game
 }
-
-// function switchTurn() {
-//   // Toggle between 'white' and 'black'
-//   currentPlayer.value = currentPlayer.value === 'white' ? 'black' : 'white'
-//   console.log(`It's now ${currentPlayer.value}'s turn.`)
-// }
-
-// function switchTurn() {
-//   const currentPlayer = ref(1)
-//   if (cards.type == 'cat' || 'plate' || 'mouse-trap-glue') {
-//     currentPlayer.value = currentPlayer.value === 1 ? 2 : 1
-//     console.log('end')
-
-//   //   setTimeout(() => {
-//   //     console.log(`Player number ${currentPlayer.value}'s turn.`)
-//   //   }, 2000);
-//   } else if (cards.type == 'spring' || 'bean') {
-//     console.log('choose another move')
-//     handleCardClick()
-//   } else if (cards.type == 'cheddar-cheese', 'gouda-cheese', 'swiss-cheese') {
-//     chessePower()
-//     // if (items.hasMouse == 'true') {
-//     //   console.log('wait for the king.')
-
-//     // }
-//   }
-// }
 </script>
 
 <template>
@@ -312,6 +334,4 @@ const startGame = () => {
   </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
