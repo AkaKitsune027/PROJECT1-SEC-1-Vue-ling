@@ -1,6 +1,6 @@
-card cat
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+
 
 const currentPage = ref('home')
 
@@ -55,6 +55,31 @@ const cards = ref(generateCards())
 
 console.dir(cards.value)
 
+// ฟังก์ชันคอมพิวต์เพื่อนับจำนวนหมาก
+const totalWhitePawns = computed(() => {
+  let count = 0
+  cards.value.forEach(row => {
+    row.forEach(cell => {
+      if (cell.pawn && cell.pawn.includes('white')) {
+        count += 1
+      }
+    })
+  })
+  return count
+})
+
+const totalBlackPawns = computed(() => {
+  let count = 0
+  cards.value.forEach(row => {
+    row.forEach(cell => {
+      if (cell.pawn && cell.pawn.includes('black')) {
+        count += 1
+      }
+    })
+  })
+  return count
+})
+
 const selectedPawn = ref(null)
 const currentPlayer = ref('white')
 
@@ -80,6 +105,11 @@ const movePawn = (rowIndex, cellIndex) => {
       // ถ้าช่องเป้าหมายเป็นแมว
       if (targetCard.type === 'cat') {
         fromCard.pawn = null; // ทำให้หมากหายไป
+        if(currentPlayer.value === 'white') {
+       whiteCatCaptured.value = true; // เปลี่ยนเป็นขาวดำฝั่งสีขาว
+        } else {
+          blackCatCaptured.value = true; // เปลี่ยนเป็นขาวดำฝั่งสีดำ
+        }
       } else {
         targetCard.pawn = fromCard.pawn;
         fromCard.pawn = null; // เคลื่อนย้ายหมาก
@@ -221,9 +251,9 @@ const startGame = () => {
           <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div>
-              <div class="flex justify-center my-3 gap-2">
-                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
-                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
+              <div class="flex justify-center items-center my-3 gap-2 font-bold text-white text-3xl">
+                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl"> 
+                <span class="text-outline">x {{ totalWhitePawns }}</span>
               </div>
               <div class="flex justify-center gap-2">
                 <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
@@ -265,9 +295,9 @@ const startGame = () => {
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div>
-              <div class="flex justify-center my-3 gap-2">
-                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
-                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
+              <div class="flex justify-center items-center my-3 gap-2 font-bold text-white text-3xl">
+                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl"> 
+                <span class="text-outline">x {{ totalBlackPawns }}</span>
               </div>
               <div class="flex justify-center gap-2">
                 <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
@@ -282,4 +312,6 @@ const startGame = () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+</style>
