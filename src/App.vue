@@ -59,19 +59,34 @@ const currentPlayer = ref('white')
 const selectCell = (rowIndex, cellIndex) => {
   const selectedCard = cards.value[rowIndex][cellIndex]
 
-  if (
-    (currentPlayer.value === 'white' && selectedCard.pawn?.includes('black')) ||
-    (currentPlayer.value === 'black' && selectedCard.pawn?.includes('white'))
-  ) {
-    return
-  }
-
+  // ถ้ายังไม่มีหมากที่ถูกเลือกไว้ก่อนหน้านี้
   if (selectedPawn.value === null) {
-    if (cards.value[rowIndex][cellIndex].pawn !== null) {
-      selectedPawn.value = { row: rowIndex, col: cellIndex }
+    // ถ้าตำแหน่งที่คลิกมีหมากอยู่ (ไม่ว่าจะเป็นฝ่ายใด)
+    if (selectedCard.pawn !== null) {
+      // ตรวจสอบว่าผู้เล่นคลิกที่หมากของตัวเองหรือไม่
+      if (
+        (currentPlayer.value === 'white' && selectedCard.pawn.includes('white')) ||
+        (currentPlayer.value === 'black' && selectedCard.pawn.includes('black'))
+      ) {
+        selectedPawn.value = { row: rowIndex, col: cellIndex }
+      }
     }
-  } else {
-    movePawn(rowIndex, cellIndex)
+  }
+  // เมื่อเลือกหมากแล้ว ให้ทำการย้ายหมากหรือกินหมาก
+  else {
+    // ตรวจสอบว่าตำแหน่งปลายทางมีหมากของฝ่ายตรงข้ามหรือไม่
+    if (
+      (currentPlayer.value === 'white' && selectedCard.pawn?.includes('black')) ||
+      (currentPlayer.value === 'black' && selectedCard.pawn?.includes('white'))
+    ) {
+      // ทำการกินหมากฝ่ายตรงข้าม โดยการเคลื่อนหมากของผู้เล่นไปยังตำแหน่งนั้น
+      movePawn(rowIndex, cellIndex)
+    } else if (selectedCard.pawn === null) {
+      // ถ้าตำแหน่งปลายทางไม่มีหมากอยู่ (เป็นการย้ายหมากธรรมดา)
+      movePawn(rowIndex, cellIndex)
+    }
+
+    // รีเซ็ตตัวแปร selectedPawn หลังจากย้ายหรือกินหมากเสร็จแล้ว
     selectedPawn.value = null
   }
 }
