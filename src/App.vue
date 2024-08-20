@@ -55,23 +55,24 @@ const cards = ref(generateCards())
 console.dir(cards.value)
 
 // ฟังก์ชันคอมพิวต์เพื่อนับจำนวนหมาก
+// นับหมากที่มีสีขาว
 const totalWhitePawns = computed(() => {
   let count = 0
-  cards.value.forEach(row => {
-    row.forEach(cell => {
-      if (cell.pawn && cell.pawn.includes('white')) {
+  cards.value.forEach(row => { // วนลูปไปที่แถว (row) ทุกแถวใน cards
+    row.forEach(cell => {  // วนลูปไปที่เซลล์ (cell) ทุกเซลล์ในแต่ละแถว
+      if (cell.pawn === 'white') {   // ตรวจสอบว่ามี pawn อยู่ในเซลล์นี้และตรวจสอบว่า pawn นั้นเป็น 'white' นับแค่หนูธรรมดา
         count += 1
       }
     })
   })
   return count
 })
-
+// นับหมากที่มีสีดำ
 const totalBlackPawns = computed(() => {
   let count = 0
   cards.value.forEach(row => {
     row.forEach(cell => {
-      if (cell.pawn && cell.pawn.includes('black')) {
+      if (cell.pawn === 'black') {  // ตรวจสอบว่ามี pawn อยู่ในเซลล์นี้และตรวจสอบว่า pawn นั้นเป็น 'black' นับแค่หนูธรรมดา
         count += 1
       }
     })
@@ -139,6 +140,11 @@ const selectCell = (rowIndex, cellIndex) => {
     selectedPawn.value = null
   }
 }
+const usedCheeses = {
+  'cheddar-cheese': false,
+  'gouda-cheese': false,
+  'swiss-cheese': false
+};//เช็คชีสที่ใช้ไปแล้ว
 
 const doCardEvent = (targetCard, fromCard) => {
   if (targetCard.type === 'cat') {
@@ -172,9 +178,23 @@ const doCardEvent = (targetCard, fromCard) => {
   } else if (targetCard.type === 'cheddar-cheese' || targetCard.type === 'gouda-cheese' || targetCard.type === 'swiss-cheese') {
     if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
       const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
+      const cheeseType = targetCard.type;
+
+      if (usedCheeses[cheeseType]) {
+        alert('ชีสนี้ใช้แล้วจ้า');
+        return;
+      }
+
+      usedCheeses[cheeseType] = true;
       updatePlateCards() // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
-      const newPawnPosition = Math.round(Math.random() * plateCards.value.length)
-      console.log(plateCards.value);
+
+      if (plateCards.value.length === 0) {
+        alert('No plate')
+        return
+      }
+
+      const newPawnPosition = plateCards.value.length > 1 ? Math.round(Math.random() * plateCards.value.length) : 0
+
       plateCards.value[newPawnPosition].pawn = newPawn
     }
   } else if (targetCard.type === 'plate') {
@@ -350,7 +370,11 @@ const startGame = () => {
               cell.isReveal && cell.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
               cell.isReveal && cell.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               cell.isReveal && cell.type === 'mouse-trap-glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
-              cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : ''
+              cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : '',
+
+              cell.type.includes('cheese') ? 'bg-yellow-500' : '',// for dev
+              cell.type.includes('cat') ? 'bg-red-500' : '',// for dev
+              cell.type.includes('plate') ? 'bg-white' : '',// for dev
             ]" @click="selectCell(rowIndex, cellIndex)">
             <div v-if="cell.pawn !== null" :class="[
               'w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500',
