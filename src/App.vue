@@ -81,13 +81,32 @@ const totalBlackPawns = computed(() => {
 
 const selectedPawn = ref(null)
 const currentPlayer = ref('white')
+
+const currentEvent = ref('')
 const canMoveAgain = ref(false)
-const disabledPawn = ref({})
-
-
+const eventTriggeredCardId = ref(null)
 
 const selectCell = (rowIndex, cellIndex) => {
   const selectedCard = cards.value[rowIndex][cellIndex]
+
+  if (eventTriggeredCardId.value !== null) {
+    switch (currentEvent.value) {
+      case 'peanut':
+        if (selectedCard.id === eventTriggeredCardId.value) {
+          console.log('U can\'t select this pawn.');
+          return
+        }
+        break
+      case 'spring':
+        if (selectedCard.id !== eventTriggeredCardId.value) {
+          console.log('yeh yeh');
+          return
+        }
+        break
+      default:
+        break
+    }
+  }
 
   // ถ้ายังไม่มีหมากที่ถูกเลือกไว้ก่อนหน้านี้
   if (selectedPawn.value === null) {
@@ -125,7 +144,13 @@ const doCardEvent = (targetCard, fromCard) => {
   if (targetCard.type === 'cat') {
     fromCard.pawn = null // ทำให้หมากหายไป
   } else if (targetCard.type === 'spring') {
+
+    console.log(targetCard);
+    console.log(targetCard.length);
+    // eventTriggeredCardId.value = targetCard.id
+    currentEvent.value = 'spring'
     canMoveAgain.value = true // ตั้งค่าสถานะให้สามารถเดินได้อีกครั้ง
+
   } else if (targetCard.type === 'bean') {
     console.log('bean coming !')
     const flattenCards = []
@@ -137,14 +162,9 @@ const doCardEvent = (targetCard, fromCard) => {
     }).map((card) => card.id)
 
     if (friendCards.length > 0) {
-      disabledPawn.value[targetCard.id] = true;
+      eventTriggeredCardId.value = targetCard.id
+      currentEvent.value = 'peanut'
       canMoveAgain.value = true
-      console.dir(friendCards)
-      console.dir(fromCard.id)
-      // disabledPawn.value = true
-
-      // disabledPawn.value[friendCards] = false;
-      // friendCards = disabledPawn.value = false
     } else return
 
   } else if (targetCard.type === 'mouse-trap-glue') {
@@ -225,6 +245,10 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
 }
 
 const switchTurn = () => {
+  currentEvent.value = ''
+  canMoveAgain.value = false
+  eventTriggeredCardId.value = null
+
   if (currentPlayer.value === 'white') {
     currentPlayer.value = 'black'
   } else {
@@ -334,7 +358,8 @@ const startGame = () => {
               cell.pawn === 'white-king' ? 'bg-[url(/king_light-gray.png)]' : '',
               cell.pawn === 'black' ? 'bg-[url(/soldier_dark-gray.png)]' : '',
               cell.pawn === 'white' ? 'bg-[url(/soldier_ligth-gray.png)]' : '',
-              disabledPawn[cell.id] ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+              currentEvent === 'peanut' && eventTriggeredCardId === cell.id ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+              currentEvent === 'spring' && eventTriggeredCardId !== cell.id ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
             ]">
             </div>
           </div>
