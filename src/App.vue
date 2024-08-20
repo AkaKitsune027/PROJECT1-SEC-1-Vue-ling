@@ -120,6 +120,11 @@ const selectCell = (rowIndex, cellIndex) => {
     selectedPawn.value = null
   }
 }
+const usedCheeses = {
+  'cheddar-cheese': false,
+  'gouda-cheese': false,
+  'swiss-cheese': false
+};//เช็คชีสที่ใช้ไปแล้ว
 
 const doCardEvent = (targetCard, fromCard) => {
   if (targetCard.type === 'cat') {
@@ -133,17 +138,29 @@ const doCardEvent = (targetCard, fromCard) => {
   } else if (targetCard.type === 'cheddar-cheese' || targetCard.type === 'gouda-cheese' || targetCard.type === 'swiss-cheese') {
     if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
       const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
+      const cheeseType = targetCard.type;
+
+      if (usedCheeses[cheeseType]) {
+        alert('ชีสนี้ใช้แล้วจ้า');
+        return;
+      }
+
+      usedCheeses[cheeseType] = true;
       updatePlateCards() // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
-      
-      const newPawnPosition = Math.round(Math.random() * plateCards.value.length)
-      console.log(plateCards.value);
+
+      if (plateCards.value.length === 0) {
+        alert('No plate')
+        return
+      }
+
+      const newPawnPosition = plateCards.value.length > 1 ? Math.round(Math.random() * plateCards.value.length) : 0
 
       plateCards.value[newPawnPosition].pawn = newPawn
     }
   } else if (targetCard.type === 'plate') {
     // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
   }
-} 
+}
 
 const plateCards = ref([])
 const updatePlateCards = () => {
@@ -151,7 +168,7 @@ const updatePlateCards = () => {
   for (const row of cards.value) {
     for (const card of row) {
       if (card.isReveal && card.type === 'plate' && !card.pawn) {
-        plateCards.value.push(card) 
+        plateCards.value.push(card)
       }
     }
   }
@@ -284,7 +301,7 @@ const startGame = () => {
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center  gap-2 font-bold text-white text-3xl">
-                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl"> 
+                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
                 <span class="text-outline">x {{ totalWhitePawns }}</span>
               </div>
               <div class="flex justify-center gap-2">
@@ -309,7 +326,11 @@ const startGame = () => {
               cell.isReveal && cell.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
               cell.isReveal && cell.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               cell.isReveal && cell.type === 'mouse-trap-glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
-              cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : ''
+              cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : '',
+
+              cell.type.includes('cheese') ? 'bg-yellow-500' : '',// for dev
+              cell.type.includes('cat') ? 'bg-red-500' : '',// for dev
+              cell.type.includes('plate') ? 'bg-white' : '',// for dev
             ]" @click="selectCell(rowIndex, cellIndex)">
             <div v-if="cell.pawn !== null" :class="[
               'w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500',
@@ -328,7 +349,7 @@ const startGame = () => {
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center gap-2 font-bold text-white text-3xl">
-                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl"> 
+                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
                 <span class="text-outline">x {{ totalBlackPawns }}</span>
               </div>
               <div class="flex justify-center gap-2">
