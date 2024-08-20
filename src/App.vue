@@ -42,7 +42,8 @@ function generateCards() {
                     ? 'black'
                     : r === 4 && c === 5
                       ? 'black'
-                      : null
+                      : null,
+        isStucked: false
       })
     }
     result.push(row)
@@ -82,10 +83,12 @@ const totalBlackPawns = computed(() => {
 
 const selectedPawn = ref(null)
 const currentPlayer = ref('white')
+const stuckedPlayer = ref([])
 
 const currentEvent = ref('')
 const canMoveAgain = ref(false)
 const eventTriggeredCardId = ref(null)
+
 
 const selectCell = (rowIndex, cellIndex) => {
   const selectedCard = cards.value[rowIndex][cellIndex]
@@ -174,7 +177,9 @@ const doCardEvent = (targetCard, fromCard) => {
     } else return
 
   } else if (targetCard.type === 'mouse-trap-glue') {
-    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+    stuckedPlayer.value.push(currentPlayer.value)
+    targetCard.isStucked = true
+    console.log('You are stuck.')
   } else if (targetCard.type === 'cheddar-cheese' || targetCard.type === 'gouda-cheese' || targetCard.type === 'swiss-cheese') {
     if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
       const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
@@ -273,6 +278,14 @@ const switchTurn = () => {
     currentPlayer.value = 'black'
   } else {
     currentPlayer.value = 'white'
+  }
+  if (stuckedPlayer.value.includes(currentPlayer.value)) {
+    // alert("This pawn is stuck! It's the opponent's turn.")
+    setTimeout(() => {
+      console.log("This pawn is stuck! It's the opponent's turn.") 
+      switchTurn()
+    }, 3000)
+    return
   }
   console.log(`It's now ${currentPlayer.value}'s turn.`)
 }
