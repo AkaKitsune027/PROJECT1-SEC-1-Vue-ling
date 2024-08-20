@@ -82,7 +82,7 @@ const totalBlackPawns = computed(() => {
 const selectedPawn = ref(null)
 const currentPlayer = ref('white')
 const canMoveAgain = ref(false)
-const disabledPawn = ref(false)
+const disabledPawn = ref({})
 
 
 
@@ -138,10 +138,10 @@ const doCardEvent = (targetCard, fromCard) => {
 
     if (friendCards.length > 1) {
       console.dir(friendCards)
-      console.log(fromCard);
+      console.dir(fromCard)
       canMoveAgain.value = true
-      // disabledPawn.value = true
-
+      disabledPawn.value[fromCard.id] = true
+      console.dir(fromCard.id)
     } else return
 
   } else if (targetCard.type === 'mouse-trap-glue') {
@@ -150,10 +150,8 @@ const doCardEvent = (targetCard, fromCard) => {
     if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
       const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
       updatePlateCards() // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
-
       const newPawnPosition = Math.round(Math.random() * plateCards.value.length)
       console.log(plateCards.value);
-
       plateCards.value[newPawnPosition].pawn = newPawn
     }
   } else if (targetCard.type === 'plate') {
@@ -328,12 +326,12 @@ const startGame = () => {
               cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : ''
             ]" @click="selectCell(rowIndex, cellIndex)">
             <div v-if="cell.pawn !== null" :class="[
-              'w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500',
+              'w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500 cursor-pointer',
               cell.pawn === 'black-king' ? 'bg-[url(/king_dark-gray.png)]' : '',
               cell.pawn === 'white-king' ? 'bg-[url(/king_light-gray.png)]' : '',
               cell.pawn === 'black' ? 'bg-[url(/soldier_dark-gray.png)]' : '',
-              cell.pawn === 'white' ? 'bg-[url(/soldier_ligth-gray.png)]' : ''
-            ]"></div>
+              cell.pawn === 'white' ? 'bg-[url(/soldier_ligth-gray.png)]' : '',
+              disabledPawn[cell.id] ? 'cursor:false opacity-50' : 'cursor-pointer']"></div>
           </div>
         </div>
       </div>
