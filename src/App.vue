@@ -56,23 +56,24 @@ const cards = ref(generateCards())
 console.dir(cards.value)
 
 // ฟังก์ชันคอมพิวต์เพื่อนับจำนวนหมาก
+// นับหมากที่มีสีขาว
 const totalWhitePawns = computed(() => {
   let count = 0
-  cards.value.forEach(row => {
-    row.forEach(cell => {
-      if (cell.pawn && cell.pawn.includes('white')) {
+  cards.value.forEach(row => { // วนลูปไปที่แถว (row) ทุกแถวใน cards
+    row.forEach(cell => {  // วนลูปไปที่เซลล์ (cell) ทุกเซลล์ในแต่ละแถว
+      if (cell.pawn === 'white') {   // ตรวจสอบว่ามี pawn อยู่ในเซลล์นี้และตรวจสอบว่า pawn นั้นเป็น 'white' นับแค่หนูธรรมดา
         count += 1
       }
     })
   })
   return count
 })
-
+// นับหมากที่มีสีดำ
 const totalBlackPawns = computed(() => {
   let count = 0
   cards.value.forEach(row => {
     row.forEach(cell => {
-      if (cell.pawn && cell.pawn.includes('black')) {
+      if (cell.pawn === 'black') {  // ตรวจสอบว่ามี pawn อยู่ในเซลล์นี้และตรวจสอบว่า pawn นั้นเป็น 'black' นับแค่หนูธรรมดา
         count += 1
       }
     })
@@ -83,10 +84,33 @@ const totalBlackPawns = computed(() => {
 const selectedPawn = ref(null)
 const currentPlayer = ref('white')
 const stuckedPlayer = ref([])
-const canMoveAgain = ref(false);
+
+const currentEvent = ref('')
+const canMoveAgain = ref(false)
+const eventTriggeredCardId = ref(null)
+
 
 const selectCell = (rowIndex, cellIndex) => {
   const selectedCard = cards.value[rowIndex][cellIndex]
+
+  if (eventTriggeredCardId.value !== null) {
+    switch (currentEvent.value) {
+      case 'peanut':
+        if (selectedCard.id === eventTriggeredCardId.value) {
+          console.log('U can\'t select this pawn.');
+          return
+        }
+        break
+      case 'spring':
+        if (selectedCard.id !== eventTriggeredCardId.value) {
+          console.log('yeh yeh');
+          return
+        }
+        break
+      default:
+        break
+    }
+  }
 
   // ถ้ายังไม่มีหมากที่ถูกเลือกไว้ก่อนหน้านี้
   if (selectedPawn.value === null) {
@@ -119,14 +143,39 @@ const selectCell = (rowIndex, cellIndex) => {
     selectedPawn.value = null
   }
 }
+const usedCheeses = {
+  'cheddar-cheese': false,
+  'gouda-cheese': false,
+  'swiss-cheese': false
+};//เช็คชีสที่ใช้ไปแล้ว
 
 const doCardEvent = (targetCard, fromCard) => {
   if (targetCard.type === 'cat') {
-    fromCard.pawn = null; // ทำให้หมากหายไป
+    fromCard.pawn = null // ทำให้หมากหายไป
   } else if (targetCard.type === 'spring') {
-    canMoveAgain.value = true; // ตั้งค่าสถานะให้สามารถเดินได้อีกครั้ง
+
+    console.log(targetCard);
+    console.log(targetCard.length);
+    // eventTriggeredCardId.value = targetCard.id
+    currentEvent.value = 'spring'
+    canMoveAgain.value = true // ตั้งค่าสถานะให้สามารถเดินได้อีกครั้ง
+
   } else if (targetCard.type === 'bean') {
-    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
+    console.log('bean coming !')
+    const flattenCards = []
+    for (const row of cards.value) {
+      flattenCards.push(...row)
+    }
+    let friendCards = flattenCards.filter((card) => {
+      return card.pawn?.includes(fromCard.pawn.split('-')[0]) && card.id !== fromCard.id
+    }).map((card) => card.id)
+
+    if (friendCards.length > 0) {
+      eventTriggeredCardId.value = targetCard.id
+      currentEvent.value = 'peanut'
+      canMoveAgain.value = true
+    } else return
+
   } else if (targetCard.type === 'mouse-trap-glue') {
     stuckedPlayer.value.push(currentPlayer.value)
     targetCard.isStucked = true
@@ -134,17 +183,29 @@ const doCardEvent = (targetCard, fromCard) => {
   } else if (targetCard.type === 'cheddar-cheese' || targetCard.type === 'gouda-cheese' || targetCard.type === 'swiss-cheese') {
     if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
       const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
+      const cheeseType = targetCard.type;
+
+      if (usedCheeses[cheeseType]) {
+        alert('ชีสนี้ใช้แล้วจ้า');
+        return;
+      }
+
+      usedCheeses[cheeseType] = true;
       updatePlateCards() // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
-      
-      const newPawnPosition = Math.round(Math.random() * plateCards.value.length)
-      console.log(plateCards.value);
+
+      if (plateCards.value.length === 0) {
+        alert('No plate')
+        return
+      }
+
+      const newPawnPosition = plateCards.value.length > 1 ? Math.round(Math.random() * plateCards.value.length) : 0
 
       plateCards.value[newPawnPosition].pawn = newPawn
     }
   } else if (targetCard.type === 'plate') {
     // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
   }
-} 
+}
 
 const plateCards = ref([])
 const updatePlateCards = () => {
@@ -152,7 +213,7 @@ const updatePlateCards = () => {
   for (const row of cards.value) {
     for (const card of row) {
       if (card.isReveal && card.type === 'plate' && !card.pawn) {
-        plateCards.value.push(card) 
+        plateCards.value.push(card)
       }
     }
   }
@@ -209,6 +270,10 @@ const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
 }
 
 const switchTurn = () => {
+  currentEvent.value = ''
+  canMoveAgain.value = false
+  eventTriggeredCardId.value = null
+
   if (currentPlayer.value === 'white') {
     currentPlayer.value = 'black'
   } else {
@@ -293,7 +358,7 @@ const startGame = () => {
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center  gap-2 font-bold text-white text-3xl">
-                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl"> 
+                <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
                 <span class="text-outline">x {{ totalWhitePawns }}</span>
               </div>
               <div class="flex justify-center gap-2">
@@ -318,15 +383,22 @@ const startGame = () => {
               cell.isReveal && cell.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
               cell.isReveal && cell.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               cell.isReveal && cell.type === 'mouse-trap-glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
-              cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : ''
+              cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : '',
+
+              cell.type.includes('cheese') ? 'bg-yellow-500' : '',// for dev
+              cell.type.includes('cat') ? 'bg-red-500' : '',// for dev
+              cell.type.includes('plate') ? 'bg-white' : '',// for dev
             ]" @click="selectCell(rowIndex, cellIndex)">
             <div v-if="cell.pawn !== null" :class="[
               'w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500',
               cell.pawn === 'black-king' ? 'bg-[url(/king_dark-gray.png)]' : '',
               cell.pawn === 'white-king' ? 'bg-[url(/king_light-gray.png)]' : '',
               cell.pawn === 'black' ? 'bg-[url(/soldier_dark-gray.png)]' : '',
-              cell.pawn === 'white' ? 'bg-[url(/soldier_ligth-gray.png)]' : ''
-            ]"></div>
+              cell.pawn === 'white' ? 'bg-[url(/soldier_ligth-gray.png)]' : '',
+              currentEvent === 'peanut' && eventTriggeredCardId === cell.id ? 'cursor-not-allowed opacity-50' : 'cursor-pointer',
+              currentEvent === 'spring' && eventTriggeredCardId !== cell.id ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+            ]">
+            </div>
           </div>
         </div>
       </div>
@@ -337,7 +409,7 @@ const startGame = () => {
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center gap-2 font-bold text-white text-3xl">
-                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl"> 
+                <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
                 <span class="text-outline">x {{ totalBlackPawns }}</span>
               </div>
               <div class="flex justify-center gap-2">
