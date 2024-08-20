@@ -55,23 +55,24 @@ const cards = ref(generateCards())
 console.dir(cards.value)
 
 // ฟังก์ชันคอมพิวต์เพื่อนับจำนวนหมาก
+// นับหมากที่มีสีขาว
 const totalWhitePawns = computed(() => {
   let count = 0
-  cards.value.forEach(row => {
-    row.forEach(cell => {
-      if (cell.pawn && cell.pawn.includes('white')) {
+  cards.value.forEach(row => { // วนลูปไปที่แถว (row) ทุกแถวใน cards
+    row.forEach(cell => {  // วนลูปไปที่เซลล์ (cell) ทุกเซลล์ในแต่ละแถว
+      if (cell.pawn === 'white') {   // ตรวจสอบว่ามี pawn อยู่ในเซลล์นี้และตรวจสอบว่า pawn นั้นเป็น 'white' นับแค่หนูธรรมดา
         count += 1
       }
     })
   })
   return count
 })
-
+// นับหมากที่มีสีดำ
 const totalBlackPawns = computed(() => {
   let count = 0
   cards.value.forEach(row => {
     row.forEach(cell => {
-      if (cell.pawn && cell.pawn.includes('black')) {
+      if (cell.pawn === 'black') {  // ตรวจสอบว่ามี pawn อยู่ในเซลล์นี้และตรวจสอบว่า pawn นั้นเป็น 'black' นับแค่หนูธรรมดา
         count += 1
       }
     })
