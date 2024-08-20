@@ -132,16 +132,19 @@ const doCardEvent = (targetCard, fromCard) => {
     for (const row of cards.value) {
       flattenCards.push(...row)
     }
-    const friendCards = flattenCards.filter((card) => {
+    let friendCards = flattenCards.filter((card) => {
       return card.pawn?.includes(fromCard.pawn.split('-')[0]) && card.id !== fromCard.id
     }).map((card) => card.id)
 
-    if (friendCards.length > 1) {
-      console.dir(friendCards)
-      console.dir(fromCard)
+    if (friendCards.length > 0) {
+      disabledPawn.value[targetCard.id] = true;
       canMoveAgain.value = true
-      disabledPawn.value[fromCard.id] = true
+      console.dir(friendCards)
       console.dir(fromCard.id)
+      // disabledPawn.value = true
+
+      // disabledPawn.value[friendCards] = false;
+      // friendCards = disabledPawn.value = false
     } else return
 
   } else if (targetCard.type === 'mouse-trap-glue') {
@@ -326,12 +329,14 @@ const startGame = () => {
               cell.isReveal && cell.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : ''
             ]" @click="selectCell(rowIndex, cellIndex)">
             <div v-if="cell.pawn !== null" :class="[
-              'w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500 cursor-pointer',
+              'w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500',
               cell.pawn === 'black-king' ? 'bg-[url(/king_dark-gray.png)]' : '',
               cell.pawn === 'white-king' ? 'bg-[url(/king_light-gray.png)]' : '',
               cell.pawn === 'black' ? 'bg-[url(/soldier_dark-gray.png)]' : '',
               cell.pawn === 'white' ? 'bg-[url(/soldier_ligth-gray.png)]' : '',
-              disabledPawn[cell.id] ? 'cursor:false opacity-50' : 'cursor-pointer']"></div>
+              disabledPawn[cell.id] ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+            ]">
+            </div>
           </div>
         </div>
       </div>
