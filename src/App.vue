@@ -190,14 +190,14 @@ const doCardEvent = (targetCard, fromCard) => {
         return;
       }
 
-      usedCheeses[cheeseType] = true;
+      
       updatePlateCards() // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
 
       if (plateCards.value.length === 0) {
         alert('No plate')
         return
       }
-
+      usedCheeses[cheeseType] = true;
       const newPawnPosition = plateCards.value.length > 1 ? Math.round(Math.random() * plateCards.value.length) : 0
 
       plateCards.value[newPawnPosition].pawn = newPawn
