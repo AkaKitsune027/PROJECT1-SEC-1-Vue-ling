@@ -38,11 +38,38 @@ export class Mouse {
         }
     }
 
+    validateMove(newCard) {
+        if (newCard === this.card) {
+            return false
+        }
+
+        if (this.isDisabled) {
+            return false
+        }
+
+        if (this.disableCard.includes(newCard)) {
+            return false
+        }
+
+        if (newCard.mouse && newCard.mouse.faction === this.faction) {
+            return false
+        }
+
+        return true
+    }
+
     /**
      * 
-     * @param {Card} card 
+     * @param {Card} newCard 
      */
-    moveTo(card) {
-        this.card = card
+    moveTo(newCard) {
+        if (!this.validateMove(newCard)) return
+
+        newCard.isReveal = true
+
+        setTimeout(() => {
+            this.card.mouse = null
+            this.card = newCard
+        }, 350)
     }
 }

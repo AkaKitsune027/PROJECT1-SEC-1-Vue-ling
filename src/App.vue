@@ -20,7 +20,7 @@ const typesArray = [
 const shuffledTypes = typesArray.sort(() => Math.random() - 0.5)
 
 const cards = ref([])
-const mouses = ref([])
+// const mouses = ref([])
 //* ใช้เก็บหนูที่ถูกเลือก
 const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
@@ -40,10 +40,8 @@ function setupBoard() {
 
 
       card.mouse = mouse
-
       // mouses.value.push(mouse)
       row.push(card)
-      mouse?.moveTo(card)
     }
     cards.value.push(row)
   }
@@ -54,11 +52,15 @@ console.dir(cards.value)
 //* ฟังก์ชันคอมพิวต์เพื่อนับจำนวนหมาก
 //* นับหมากที่มีสีขาว
 const totalWhitePawns = computed(() => {
-  return mouses.value.filter((m) => m?.faction === 'white').length
+  return cards.value.reduce((acc, row) => {
+    return acc + row.filter((c) => c.mouse?.faction === 'white').length
+  }, 0)
 })
 //* นับหมากที่มีสีดำ
 const totalBlackPawns = computed(() => {
-  return mouses.value.filter((m) => m?.faction === 'black').length
+  return cards.value.reduce((acc, row) => {
+    return acc + row.filter((c) => c.mouse?.faction === 'black').length
+  }, 0)
 })
 
 // const stuckedPlayer = ref([])
@@ -109,11 +111,11 @@ const handleSelectCard = (selectedCard) => {
     //   movePawn(rowIndex, cellIndex)
     // }
 
-    console.log('Before move', cards.value);
+    console.log('Before move', cards.value)
 
-    selectedMouse.value.card = selectedCard
+    selectedMouse.value.moveTo(selectedCard)
 
-    console.log('After move', cards.value);
+    console.log('After move', cards.value)
 
     //* รีเซ็ตตัวแปร selectedPawn หลังจากย้ายหรือกินหมากเสร็จแล้ว
     selectedMouse.value = null
@@ -273,13 +275,9 @@ const switchTurn = () => {
 
 const startGame = () => {
   currentPage.value = 'game' // เมื่อกดปุ่ม play game จะเปลี่ยนไปที่หน้า game
+  setupBoard()
 }
 
-onMounted(() => {
-  setupBoard()
-  // cards.value[0][0].mouse = new Mouse('white', 'king')
-
-})
 </script>
 
 <template>
@@ -378,12 +376,14 @@ onMounted(() => {
               card.type.includes('peanut') ? 'bg-orange-400' : '',// for dev
               card.type.includes('spring') ? 'bg-lime-500' : ''
             ]">
-            <div v-if="card.mouse" :class="{
-              'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
-              'bg-[url(/king-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'king',
-              'bg-[url(/soldier-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'soldier',
-              'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier'
-            }" class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
+            <div v-if="card.mouse"
+              :class="{
+                'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
+                'bg-[url(/king-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'king',
+                'bg-[url(/soldier-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'soldier',
+                'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier'
+              }"
+              class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
             </div>
           </div>
         </div>
