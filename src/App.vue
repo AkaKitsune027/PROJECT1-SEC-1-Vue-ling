@@ -1,10 +1,12 @@
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue'
-import { Mouse } from './classes/Mouse.js'
-import { Card } from './classes/Card.js';
+import { ref, computed } from 'vue'
+import Mouse from './classes/Mouse.js'
+import Card from './classes/Card.js';
 
+// Current page
 const currentPage = ref('home')
 
+// Card types array
 const typesArray = [
   ...Array(10).fill('plate'),
   ...Array(7).fill('spring'),
@@ -16,15 +18,27 @@ const typesArray = [
   ...Array(3).fill('cat')
 ]
 
-// สุ่มตำแหน่งของ elements ใน array
 const shuffledTypes = typesArray.sort(() => Math.random() - 0.5)
-
 const cards = ref([])
-// const mouses = ref([])
-//* ใช้เก็บหนูที่ถูกเลือก
 const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
 
+const usedCheeses = ref({
+  'white': {
+    'cheddar-cheese': false,
+    'gouda-cheese': false,
+    'swiss-cheese': false
+  },
+  'black': {
+    'cheddar-cheese': false,
+    'gouda-cheese': false,
+    'swiss-cheese': false
+  }
+})
+
+/**
+ * Setup the board
+ */
 function setupBoard() {
   for (let r = 0; r < 6; r++) {
     const row = []
@@ -38,243 +52,98 @@ function setupBoard() {
       else if (card.id === 29 || card.id === 34) mouse = new Mouse('black', 'soldier')
       else if (card.id === 35) mouse = new Mouse('black', 'king')
 
-
       card.mouse = mouse
-      // mouses.value.push(mouse)
       row.push(card)
     }
     cards.value.push(row)
   }
 }
 
-console.dir(cards.value)
-
-//* ฟังก์ชันคอมพิวต์เพื่อนับจำนวนหมาก
-//* นับหมากที่มีสีขาว
-const totalWhitePawns = computed(() => {
-  return cards.value.reduce((acc, row) => {
-    return acc + row.filter((c) => c.mouse?.faction === 'white').length
-  }, 0)
+/**
+ * Total white mouses
+ */
+const totalWhiteMouses = computed(() => {
+  return cards.value.flat().filter((c) => c.mouse?.faction === 'white').length
 })
-//* นับหมากที่มีสีดำ
-const totalBlackPawns = computed(() => {
-  return cards.value.reduce((acc, row) => {
-    return acc + row.filter((c) => c.mouse?.faction === 'black').length
-  }, 0)
-})
-
-// const stuckedPlayer = ref([])
-
-// const currentEvent = ref('')
-// const canMoveAgain = ref(false)
-// const eventTriggeredCardId = ref(null)
 
 /**
- * 
- * @param {Card} selectedCard 
+ * Total black mouses
+ */
+const totalBlackMouses = computed(() => {
+  return cards.value.flat().filter((c) => c.mouse?.faction === 'black').length
+})
+
+/**
+ * Trigger card event
+ * @param {Card} card - The card that was clicked
+ */
+const triggerCardEvent = (card) => {
+  if (card.type === 'cat') {
+    card.mouse === null
+  } else if (card.type === 'spring') {
+
+  } else if (card.type === 'peanut') {
+
+  } else if (card.type === 'glue') {
+
+  } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
+
+    const faction = currentPlayerFaction.value
+    const cheeseType = card.type
+
+    if (usedCheeses.value[faction][cheeseType]) {
+      alert('ชีสนี้ใช้แล้วจ้า')
+      return
+    }
+
+    const plateCards = cards.value.flat().filter(c => c.isReveal && c.type === 'plate' && c.mouse === null)
+
+    if (plateCards.length === 0) {
+      alert('No plate')
+      return
+    }
+
+    usedCheeses.value[faction][cheeseType] = true
+
+    const NewMouseCardIndex = plateCards.length > 1 ? Math.round(Math.random() * plateCards.length) : 0
+
+    plateCards[NewMouseCardIndex].mouse = new Mouse(faction, 'soldier')
+
+  } else if (card.type === 'plate') {
+
+  }
+}
+
+/**
+ * Switch turn between white and black
+ */
+function switchTurn() {
+  currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
+}
+
+/**
+ * This function is called when a card is clicked.
+ * @param {Card} selectedCard - The card that was clicked
  */
 const handleSelectCard = (selectedCard) => {
 
-  // if (eventTriggeredCardId.value !== null) {
-  //   switch (currentEvent.value) {
-  //     case 'peanut':
-  //       if (selectedCard.id === eventTriggeredCardId.value) {
-  //         console.log('U can\'t select this pawn.');
-  //         return
-  //       }
-  //       break
-  //     case 'spring':
-  //       if (selectedCard.id !== eventTriggeredCardId.value) {
-  //         console.log('yeh yeh');
-  //         return
-  //       }
-  //       break
-  //     default:
-  //       break
-  //   }
-  // }
-
-  if (selectedMouse.value === null) {
-    if (selectedCard.mouse !== null) {
-      if (selectedCard.mouse.faction === currentPlayerFaction.value) {
-        selectedMouse.value = selectedCard.mouse
-        // console.log('mouse selected')
-      }
-    }
-  } else {
-    // //* ตรวจสอบว่าตำแหน่งปลายทางมีหมากของฝ่ายตรงข้ามหรือไม่
-    // if (selectedCard.mouse.faction !== currentPlayerFaction.value) {
-    //   //* ทำการกินหมากฝ่ายตรงข้าม โดยการเคลื่อนหมากของผู้เล่นไปยังตำแหน่งนั้น
-    //   movePawn(rowIndex, cellIndex)
-    // } else if (selectedCard.pawn === null) {
-    //   //* ถ้าตำแหน่งปลายทางไม่มีหมากอยู่ (เป็นการย้ายหมากธรรมดา)
-    //   movePawn(rowIndex, cellIndex)
-    // }
-
-    console.log('Before move', cards.value)
-
-    selectedMouse.value.moveTo(selectedCard)
-
-    console.log('After move', cards.value)
-
-    //* รีเซ็ตตัวแปร selectedPawn หลังจากย้ายหรือกินหมากเสร็จแล้ว
-    selectedMouse.value = null
-  }
-}
-
-//* เช็กชีสที่ใช้ไปแล้ว
-const usedCheeses = {
-  'cheddar-cheese': false,
-  'gouda-cheese': false,
-  'swiss-cheese': false
-}
-
-const doCardEvent = (targetCard, fromCard) => {
-  if (targetCard.type === 'cat') {
-    fromCard.pawn = null // ทำให้หมากหายไป
-  } else if (targetCard.type === 'spring') {
-
-    // console.log(targetCard);
-    // console.log(targetCard.length);
-    if (targetCard.type === 'spring') {
-      eventTriggeredCardId.value = targetCard.id
-      // currentEvent.value = 'spring'
-      //* ตั้งค่าสถานะให้สามารถเดินได้อีกครั้ง
-      canMoveAgain.value = true
-    }
-
-
-  } else if (targetCard.type === 'peanut') {
-    // const flattenCards = []
-    // for (const row of cards.value) {
-    //   flattenCards.push(...row)
-    // }
-    // let friendCards = flattenCards.filter((card) => {
-    //   return card.pawn?.includes(fromCard.pawn.split('-')[0]) && card.id !== fromCard.id
-    // }).map((card) => card.id)
-
-    // if (friendCards.length > 0) {
-    //   eventTriggeredCardId.value = targetCard.id
-    //   currentEvent.value = 'peanut'
-    canMoveAgain.value = true
-    // } else return
-
-  } else if (targetCard.type === 'glue') {
-    // stuckedPlayer.value.push(currentPlayerFaction.value)
-    targetCard.isStucked = true
-    // console.log('You are stuck.')
-  } else if (targetCard.type === 'cheddar-cheese' || targetCard.type === 'gouda-cheese' || targetCard.type === 'swiss-cheese') {
-    if (fromCard.pawn === 'white-king' || fromCard.pawn === 'black-king') {
-      // const newPawn = fromCard.pawn.split('-')[0] === 'white' ? 'white' : 'black'
-      // const cheeseType = targetCard.type;
-
-      if (usedCheeses[cheeseType]) {
-        alert('ชีสนี้ใช้แล้วจ้า')
-        return
-      }
-
-      // อัพเดต plateCards หลังจากเปลี่ยนแปลงชีส
-      updatePlateCards()
-
-      if (plateCards.value.length === 0) {
-        alert('No plate')
-        return
-      }
-      usedCheeses[cheeseType] = true;
-      const newPawnPosition = plateCards.value.length > 1 ? Math.round(Math.random() * plateCards.value.length) : 0
-
-      plateCards.value[newPawnPosition].pawn = newPawn
-    }
-  } else if (targetCard.type === 'plate') {
-    // เขียนโค๊ดของเพื่อนตรงนี้นะคะ
-  }
-}
-
-const plateCards = ref([])
-const updatePlateCards = () => {
-  plateCards.value = []
-  for (const row of cards.value) {
-    for (const card of row) {
-      if (card.isReveal && card.type === 'plate' && !card.pawn) {
-        plateCards.value.push(card)
-      }
-    }
-  }
-}
-
-
-const movePawn = (rowIndex, cellIndex) => {
-  const { row, col } = selectedPawn.value;
-  if (isValidMove(row, col, rowIndex, cellIndex)) {
-    const targetCard = cards.value[rowIndex][cellIndex];
-    const fromCard = cards.value[row][col];
-    // ถ้าช่องเป้าหมายเปิดเผยแล้ว
-    if (targetCard.isReveal) {
-      doCardEvent(targetCard, fromCard);
-      targetCard.pawn = fromCard.pawn;
-      fromCard.pawn = null;
-    } else {
-      // ถ้าช่องเป้าหมายยังไม่เปิดเผย
-      doCardEvent(targetCard, fromCard);
-      targetCard.isReveal = true;
-
-      setTimeout(() => {
-        targetCard.pawn = fromCard.pawn;
-        fromCard.pawn = null; // เคลื่อนย้ายหมาก
-      }, 325);
-    }
-    // ตรวจสอบว่าเราต้องเปลี่ยนเทิร์นหรือไม่
-    if (canMoveAgain.value) {
-      // ตั้งค่าสถานะเป็น false หลังจากให้เดินอีกครั้ง
-      canMoveAgain.value = false;
-    } else {
-      switchTurn();
-    }
-  }
-}
-
-
-const isValidMove = (rowFrom, colFrom, rowTo, colTo) => {
-  const rowDiff = Math.abs(rowFrom - rowTo)
-  const colDiff = Math.abs(colFrom - colTo)
-
-  // ตรวจสอบการเดินทิศทางตรงหรือทแยงภายใน 1 ช่อง
-  const isValidDirection = (rowDiff <= 1 && colDiff <= 1)
-
-  // ตรวจสอบว่าเป้าหมายมีหมากสีเดียวกันหรือไม่
-  const targetCard = cards.value[rowTo][colTo]
-  const fromCard = cards.value[rowFrom][colFrom]
-
-  // หมากสีเดียวกันห้ามเดินซ้อนกัน
-  if (targetCard.pawn && targetCard.pawn.split('-')[0] === fromCard.pawn.split('-')[0]) return false
-
-  // ตรวจสอบว่าทิศทางการเดินถูกต้องหรือไม่
-  return isValidDirection
-}
-
-const switchTurn = () => {
-  currentEvent.value = ''
-  canMoveAgain.value = false
-  eventTriggeredCardId.value = null
-
-  if (currentPlayerFaction.value === 'white') {
-    currentPlayerFaction.value = 'black'
-  } else {
-    currentPlayerFaction.value = 'white'
-  }
-  if (stuckedPlayer.value.includes(currentPlayerFaction.value)) {
-    // alert("This pawn is stuck! It's the opponent's turn.")
-    setTimeout(() => {
-      console.log("This pawn is stuck! It's the opponent's turn.")
+  // If selected card has a mouse and it belongs to the current player, select it.
+  if (selectedCard.mouse !== null && selectedCard.mouse.faction === currentPlayerFaction.value) {
+    selectedMouse.value = selectedCard.mouse
+  } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
+    if (selectedMouse.value.moveTo(selectedCard)) { // If the move is successful, switch turn.
+      triggerCardEvent(selectedCard)
+      selectedMouse.value = null
       switchTurn()
-    }, 3000)
-    return
+    }
   }
-  console.log(`It's now ${currentPlayerFaction.value}'s turn.`)
 }
 
+/**
+ * Start the game
+ */
 const startGame = () => {
-  currentPage.value = 'game' // เมื่อกดปุ่ม play game จะเปลี่ยนไปที่หน้า game
+  currentPage.value = 'game' // Switch to game page
   setupBoard()
 }
 
@@ -344,7 +213,7 @@ const startGame = () => {
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center gap-2 font-bold text-white text-3xl">
                 <img src="/grey_mouse(1).png" alt="grey_mouse1" class="w-16 h-16 rounded-xl">
-                <span class="text-outline">x {{ totalWhitePawns }}</span>
+                <span class="text-outline">x {{ totalWhiteMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
                 <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
@@ -376,14 +245,12 @@ const startGame = () => {
               card.type.includes('peanut') ? 'bg-orange-400' : '',// for dev
               card.type.includes('spring') ? 'bg-lime-500' : ''
             ]">
-            <div v-if="card.mouse"
-              :class="{
-                'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
-                'bg-[url(/king-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'king',
-                'bg-[url(/soldier-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'soldier',
-                'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier'
-              }"
-              class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
+            <div v-if="card.mouse" :class="{
+              'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
+              'bg-[url(/king-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'king',
+              'bg-[url(/soldier-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'soldier',
+              'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier'
+            }" class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
             </div>
           </div>
         </div>
@@ -396,7 +263,7 @@ const startGame = () => {
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center gap-2 font-bold text-white text-3xl">
                 <img src="/grey_mouse(2).png" alt="grey_mouse2" class="w-16 h-16 rounded-xl">
-                <span class="text-outline">x {{ totalBlackPawns }}</span>
+                <span class="text-outline">x {{ totalBlackMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
                 <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">

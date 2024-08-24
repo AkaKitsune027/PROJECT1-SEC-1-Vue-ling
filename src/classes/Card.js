@@ -1,7 +1,7 @@
-import { Mouse } from "./Mouse"
+import Mouse from "./Mouse"
 
-export class Card {
-    static nextId = 0
+export default class Card {
+    static #nextId = 0
 
     /**
      * 
@@ -10,12 +10,12 @@ export class Card {
      *  'gouda-cheese' | 'swiss-cheese'} type 
      */
     constructor(type) {
-        this.id = Card.nextId++
+        this.id = Card.#nextId++
         this.type = type
         this.isReveal = false
+
         this._mouse = null
     }
-
 
     /** @type {Mouse} */
     get mouse() {
