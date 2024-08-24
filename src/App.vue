@@ -81,11 +81,11 @@ const triggerCardEvent = (card) => {
   if (card.type === 'cat') {
     card.mouse === null
   } else if (card.type === 'spring') {
-
+    // implement spring logic
   } else if (card.type === 'peanut') {
-
+    // implement peanut logic
   } else if (card.type === 'glue') {
-
+    // implement glue logic
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
 
     const faction = currentPlayerFaction.value
@@ -110,7 +110,7 @@ const triggerCardEvent = (card) => {
     plateCards[NewMouseCardIndex].mouse = new Mouse(faction, 'soldier')
 
   } else if (card.type === 'plate') {
-
+    // implement plate logic
   }
 }
 
