@@ -79,7 +79,7 @@ const totalBlackMouses = computed(() => {
  */
 const triggerCardEvent = (card) => {
   if (card.type === 'cat') {
-    card.mouse === null
+    card.mouse = null
   } else if (card.type === 'spring') {
     // implement spring logic
   } else if (card.type === 'peanut') {
@@ -96,18 +96,18 @@ const triggerCardEvent = (card) => {
       return
     }
 
-    const plateCards = cards.value.flat().filter(c => c.isReveal && c.type === 'plate' && c.mouse === null)
+    const availablePlateCards = cards.value.flat().filter(c => c.isReveal && c.type === 'plate' && c.mouse === null)
 
-    if (plateCards.length === 0) {
+    if (availablePlateCards.length === 0) {
       alert('No plate')
       return
     }
 
     usedCheeses.value[faction][cheeseType] = true
 
-    const NewMouseCardIndex = plateCards.length > 1 ? Math.round(Math.random() * plateCards.length) : 0
+    const newMouseCardIndex = availablePlateCards.length > 1 ? Math.round(Math.random() * availablePlateCards.length) : 0
 
-    plateCards[NewMouseCardIndex].mouse = new Mouse(faction, 'soldier')
+    availablePlateCards[newMouseCardIndex].mouse = new Mouse(faction, 'soldier')
 
   } else if (card.type === 'plate') {
     // implement plate logic
@@ -125,13 +125,13 @@ function switchTurn() {
  * This function is called when a card is clicked.
  * @param {Card} selectedCard - The card that was clicked
  */
-const handleSelectCard = (selectedCard) => {
+const handleSelectCard = async (selectedCard) => {
 
   // If selected card has a mouse and it belongs to the current player, select it.
   if (selectedCard.mouse !== null && selectedCard.mouse.faction === currentPlayerFaction.value) {
     selectedMouse.value = selectedCard.mouse
   } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
-    if (selectedMouse.value.moveTo(selectedCard)) { // If the move is successful, switch turn.
+    if (await selectedMouse.value.moveTo(selectedCard)) { // If the move is successful, switch turn.
       triggerCardEvent(selectedCard)
       selectedMouse.value = null
       switchTurn()

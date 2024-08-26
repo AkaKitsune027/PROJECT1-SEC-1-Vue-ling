@@ -1,5 +1,9 @@
 import Card from "./Card"
 
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
 export default class Mouse {
     static #nextId = 0
 
@@ -98,15 +102,15 @@ export default class Mouse {
      * This function moves the mouse to the new card
      * @param {Card} newCard - The card that the mouse wants to move to
      */
-    moveTo(newCard) {
+    async moveTo(newCard) {
         if (!this.validateMove(newCard)) return false
 
         newCard.isReveal = true
 
-        setTimeout(() => {
-            this.card.mouse = null
-            this.card = newCard
-        }, 350)
+        await timeout(350)
+
+        this.card.mouse = null
+        this.card = newCard
 
         return true
     }

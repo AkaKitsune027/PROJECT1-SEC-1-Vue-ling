@@ -29,7 +29,7 @@ export default class Card {
         if (this._mouse !== newMouse) {
             this._mouse = newMouse
             if (newMouse && newMouse.card !== this) {
-                newMouse.card = this // Link back to this card from the mouse
+                newMouse.card = this
             }
         }
     }
