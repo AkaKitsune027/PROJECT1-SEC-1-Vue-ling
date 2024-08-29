@@ -1,10 +1,12 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Mouse from './classes/Mouse.js'
 import Card from './classes/Card.js';
 
 // Current page
 const currentPage = ref('home')
+
+const isBoardLoading = ref(false)
 
 // Card types array
 const typesArray = [
@@ -18,10 +20,12 @@ const typesArray = [
   ...Array(3).fill('cat')
 ]
 
-const shuffledTypes = typesArray.sort(() => Math.random() - 0.5)
 const cards = ref([])
 const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
+const winner = ref(null)
+const winnerModalOpenState = ref(false)
+const winnerMessage = ref('') // New ref for winner message
 
 const usedCheeses = ref({
   'white': {
@@ -40,6 +44,10 @@ const usedCheeses = ref({
  * Setup the board
  */
 function setupBoard() {
+  Card.resetId()
+  isBoardLoading.value = true
+  const shuffledTypes = [...typesArray].sort(() => Math.random() - 0.5)
+
   for (let r = 0; r < 6; r++) {
     const row = []
 
@@ -57,6 +65,7 @@ function setupBoard() {
     }
     cards.value.push(row)
   }
+  isBoardLoading.value = false
 }
 
 /**
@@ -143,13 +152,73 @@ const handleSelectCard = async (selectedCard) => {
  * Start the game
  */
 const startGame = () => {
-  currentPage.value = 'game' // Switch to game page
   setupBoard()
+  currentPage.value = 'game' // Switch to game page
 }
 
+// Computed properties to check for king mice existence
+const kingsExist = computed(() => ({
+  white: cards.value.flat().some(c => c.mouse?.faction === 'white' && c.mouse.type === 'king'),
+  black: cards.value.flat().some(c => c.mouse?.faction === 'black' && c.mouse.type === 'king')
+}))
+
+// Function to show winner modal
+function showWinnerModal(message) {
+  winnerMessage.value = message
+  winnerModalOpenState.value = true
+}
+
+// Function to check game over conditions
+function checkGameOver() {
+  if (isBoardLoading.value || currentPage.value !== 'game') return
+  const { white, black } = kingsExist.value
+  if (!white) showWinnerModal('Black!')
+  if (!black) showWinnerModal('White!')
+}
+
+// Watch for changes in king mice existence
+watch(kingsExist, checkGameOver)
+
+
+const handleWinnerModalBackToMenu = () => {
+
+  currentPage.value = 'home'
+
+  cards.value = []
+  usedCheeses.value = {
+    'white': {
+      'cheddar-cheese': false,
+      'gouda-cheese': false,
+      'swiss-cheese': false
+    },
+    'black': {
+      'cheddar-cheese': false,
+      'gouda-cheese': false,
+      'swiss-cheese': false
+    }
+  }
+
+  winnerModalOpenState.value = false
+}
 </script>
 
 <template>
+  <!-- End game modal-->
+  <div v-if="winnerModalOpenState" class="inset-0 fixed top-0 z-50 bg-[#0008] grid place-items-center backdrop-blur-sm">
+    <div class="bg-amber-200 w-96 h-72 rounded-3xl flex flex-col items-center justify-center border-[1rem] border-amber-500 modal-content">
+      <div class="grid text-center drop-shadow-[0px_8px_0px_#FFEFBBFF] font-sigmar">
+        <span class="text-4xl md:text-6xl lg:text-7xl text-[#FF4500] animate-bounce">{{ winnerMessage }}</span>
+        <span class="text-3xl md:text-5xl lg:text-6xl text-[#FF4500] animate-bounce">Win</span>
+      </div>
+      <div class="flex flex-row items-center justify-center gap-10">
+        <button @click="handleWinnerModalBackToMenu" class="btn bg-gray-700 mt-4 text-white">Back to Menu</button>
+      </div>
+
+    </div>
+  </div>
+
+
+
   <div v-if="currentPage === 'home'">
     <div class="w-screen h-screen bg-[url('/bg-main-menu.png')] bg-no-repeat bg-cover">
       <div class="grid grid-rows-2 grid-flow-col gap-4 font-sigmar">
@@ -239,11 +308,11 @@ const startGame = () => {
               card.isReveal && card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
               card.isReveal && card.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : '',
 
-              card.type.includes('cheese') ? 'bg-yellow-500' : '',// for dev
-              card.type.includes('cat') ? 'bg-red-500' : '',// for dev
-              card.type.includes('plate') ? 'bg-white' : '',// for dev
-              card.type.includes('peanut') ? 'bg-orange-400' : '',// for dev
-              card.type.includes('spring') ? 'bg-lime-500' : ''
+              card.type?.includes('cheese') ? 'bg-yellow-500' : '',// for dev
+              card.type?.includes('cat') ? 'bg-red-500' : '',// for dev
+              card.type?.includes('plate') ? 'bg-white' : '',// for dev
+              card.type?.includes('peanut') ? 'bg-orange-400' : '',// for dev
+              card.type?.includes('spring') ? 'bg-lime-500' : ''
             ]">
             <div v-if="card.mouse" :class="{
               'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
