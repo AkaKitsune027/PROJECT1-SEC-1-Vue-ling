@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Mouse from './classes/Mouse.js'
 import Card from './classes/Card.js';
 
@@ -83,7 +83,13 @@ const triggerCardEvent = (card) => {
   } else if (card.type === 'spring') {
     // implement spring logic
   } else if (card.type === 'peanut') {
-    // implement peanut logic
+    if (selectedMouse.value) {
+      selectedMouse.value.isDisabled = true
+
+      if (currentPlayerFaction !== selectedCard.mouse.faction) {
+        selectedMouse.value.isDisabled = false
+      }
+    }
   } else if (card.type === 'glue') {
     // implement glue logic
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
@@ -130,12 +136,16 @@ const handleSelectCard = async (selectedCard) => {
   // If selected card has a mouse and it belongs to the current player, select it.
   if (selectedCard.mouse !== null && selectedCard.mouse.faction === currentPlayerFaction.value) {
     selectedMouse.value = selectedCard.mouse
+
   } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
-    if (await selectedMouse.value.moveTo(selectedCard)) { // If the move is successful, switch turn.
+    if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
       triggerCardEvent(selectedCard)
-      selectedMouse.value = null
-      switchTurn()
+
+      if (selectedMouse.value.isDisabled === true || selectedCard.type === 'spring') return
+      else switchTurn()
     }
+    selectedMouse.value = null
+
   }
 }
 
