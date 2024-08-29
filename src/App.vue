@@ -81,9 +81,13 @@ const triggerCardEvent = (card) => {
   if (card.type === 'cat') {
     card.mouse = null
   } else if (card.type === 'spring') {
-
+    for (const card of cards.value.flat().filter(c => c.mouse && c.mouse !== selectedMouse.value)) {
+      card.mouse.isDisabled = true
+    }
+    
   } else if (card.type === 'peanut') {
     selectedMouse.value.isDisabled = true
+    
 
   } else if (card.type === 'glue') {
     // implement glue logic
@@ -138,17 +142,15 @@ const handleSelectCard = async (selectedCard) => {
       triggerCardEvent(selectedCard)
       if (selectedMouse.value.isDisabled === true || selectedCard.type === 'spring') return
       else switchTurn()
-
-    }
-    const selectedCardMouse = selectedMouse.value
-    selectedMouse.value = null
-    if (selectedCardMouse.isDisabled === true) {
-      // console.log(currentPlayerFaction.value)
-      // console.log(getTurn)
-      if (currentPlayerFaction !== getTurn) {
-
+      
+      const selectedCardMouse = selectedMouse.value
+      console.log(selectedCardMouse)
+      selectedMouse.value = null
+      
+      if (currentPlayerFaction !== getTurn){
         selectedCardMouse.isDisabled = false
-      }
+        console.log(selectedCardMouse)
+    }
     }
   }
 }
@@ -217,7 +219,8 @@ const startGame = () => {
     </div>
     <div class="flex justify-center items-end h-24 text-5xl w-screen text-slate-50 font-sigmar">Cheese Kingdom</div>
     <div class="text-center text-2xl font-bold text-white mb-4">
-      Current Player: {{ currentPlayerFaction }}</div><!--แสดง turn-->
+      <!--แสดง turn-->
+      Current Player: {{ currentPlayerFaction }}</div>
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display rigth -->
       <div class="col-start-1">
