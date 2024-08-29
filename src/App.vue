@@ -81,15 +81,10 @@ const triggerCardEvent = (card) => {
   if (card.type === 'cat') {
     card.mouse = null
   } else if (card.type === 'spring') {
-    // implement spring logic
-  } else if (card.type === 'peanut') {
-    if (selectedMouse.value) {
-      selectedMouse.value.isDisabled = true
 
-      if (currentPlayerFaction !== selectedCard.mouse.faction) {
-        selectedMouse.value.isDisabled = false
-      }
-    }
+  } else if (card.type === 'peanut') {
+    selectedMouse.value.isDisabled = true
+
   } else if (card.type === 'glue') {
     // implement glue logic
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
@@ -138,14 +133,23 @@ const handleSelectCard = async (selectedCard) => {
     selectedMouse.value = selectedCard.mouse
 
   } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
+    const getTurn = currentPlayerFaction.value
     if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
       triggerCardEvent(selectedCard)
-
       if (selectedMouse.value.isDisabled === true || selectedCard.type === 'spring') return
       else switchTurn()
-    }
-    selectedMouse.value = null
 
+    }
+    const selectedCardMouse = selectedMouse.value
+    selectedMouse.value = null
+    if (selectedCardMouse.isDisabled === true) {
+      // console.log(currentPlayerFaction.value)
+      // console.log(getTurn)
+      if (currentPlayerFaction !== getTurn) {
+
+        selectedCardMouse.isDisabled = false
+      }
+    }
   }
 }
 

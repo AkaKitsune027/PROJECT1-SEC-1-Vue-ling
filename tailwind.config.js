@@ -15,8 +15,8 @@ export default {
           ...fontFamily.sans,
         ],
       },
-    },
-    plugins: [daisyui],
-  }
+    }
+  },
+  plugins: [daisyui]
 }
 
