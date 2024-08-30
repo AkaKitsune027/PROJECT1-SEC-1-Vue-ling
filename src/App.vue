@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import Mouse from './classes/Mouse.js'
-import Card from './classes/Card.js';
+import Card from './classes/Card.js'
 
 // Current page
 const currentPage = ref('home')
@@ -82,13 +82,17 @@ const triggerCardEvent = (card) => {
   if (card.type === 'cat') {
     card.mouse = null
   } else if (card.type === 'spring') {
-    for (const card of cards.value.flat().filter(c => c.mouse && c.mouse !== selectedMouse.value)) {
+    for (const card of cards.value.flat().filter(c => {
+      return (c.mouse && c.mouse.faction === currentPlayerFaction.value
+        && c.mouse !== selectedMouse.value)
+    })) {
       card.mouse.isDisabled = true
     }
 
+    card.mouse.disableCards.push(card)
+
   } else if (card.type === 'peanut') {
     selectedMouse.value.isDisabled = true
-
 
   } else if (card.type === 'glue') {
     // implement glue logic
@@ -115,8 +119,9 @@ const triggerCardEvent = (card) => {
 
     availablePlateCards[newMouseCardIndex].mouse = new Mouse(faction, 'soldier')
 
-  } else if (card.type === 'plate') {
-    // implement plate logic
+  }
+  if (card.type !== 'spring') {
+    selectedMouse.value.disableCards = []
   }
 }
 
@@ -124,6 +129,7 @@ const triggerCardEvent = (card) => {
  * Switch turn between white and black
  */
 function switchTurn() {
+  if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 }
 
@@ -136,18 +142,25 @@ const handleSelectCard = async (selectedCard) => {
   // If selected card has a mouse and it belongs to the current player, select it.
   if (selectedCard.mouse !== null && selectedCard.mouse.faction === currentPlayerFaction.value) {
     selectedMouse.value = selectedCard.mouse
-
   } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
     if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
-      triggerCardEvent(selectedCard)
-      previousPlayerFaction.value = currentPlayerFaction.value
-      const selectedCardMouse = selectedMouse.value
-      if (selectedMouse.value.isDisabled === true || selectedCard.type === 'spring') return
-      else switchTurn()
 
-      if (currentPlayerFaction.value !== previousPlayerFaction.value && selectedCardMouse.isDisabled === true) {
-        return selectedCardMouse.isDisabled = false
+      const currentPlayerMouses = []
+
+      for (const c of cards.value.flat()) {
+        if (c.mouse && c.mouse.faction === currentPlayerFaction.value) {
+          currentPlayerMouses.push(c.mouse)
+        }
+        continue
       }
+
+      for (const m of currentPlayerMouses) {
+        m.isDisabled = false
+        // m.disableCards = []
+      }
+
+      triggerCardEvent(selectedCard)
+      switchTurn()
       selectedMouse.value = null
     }
   }
