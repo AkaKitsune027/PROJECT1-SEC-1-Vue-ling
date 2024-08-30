@@ -22,6 +22,7 @@ const shuffledTypes = typesArray.sort(() => Math.random() - 0.5)
 const cards = ref([])
 const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
+const previousPlayerFaction = ref('')
 
 const usedCheeses = ref({
   'white': {
@@ -84,10 +85,10 @@ const triggerCardEvent = (card) => {
     for (const card of cards.value.flat().filter(c => c.mouse && c.mouse !== selectedMouse.value)) {
       card.mouse.isDisabled = true
     }
-    
+
   } else if (card.type === 'peanut') {
     selectedMouse.value.isDisabled = true
-    
+
 
   } else if (card.type === 'glue') {
     // implement glue logic
@@ -137,22 +138,20 @@ const handleSelectCard = async (selectedCard) => {
     selectedMouse.value = selectedCard.mouse
 
   } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
-    const getTurn = currentPlayerFaction.value
     if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
       triggerCardEvent(selectedCard)
+      previousPlayerFaction.value = currentPlayerFaction.value
+      const selectedCardMouse = selectedMouse.value
       if (selectedMouse.value.isDisabled === true || selectedCard.type === 'spring') return
       else switchTurn()
-      
-      const selectedCardMouse = selectedMouse.value
-      console.log(selectedCardMouse)
+
+      if (currentPlayerFaction.value !== previousPlayerFaction.value && selectedCardMouse.isDisabled === true) {
+        return selectedCardMouse.isDisabled = false
+      }
       selectedMouse.value = null
-      
-      if (currentPlayerFaction !== getTurn){
-        selectedCardMouse.isDisabled = false
-        console.log(selectedCardMouse)
-    }
     }
   }
+
 }
 
 /**
@@ -220,7 +219,8 @@ const startGame = () => {
     <div class="flex justify-center items-end h-24 text-5xl w-screen text-slate-50 font-sigmar">Cheese Kingdom</div>
     <div class="text-center text-2xl font-bold text-white mb-4">
       <!--แสดง turn-->
-      Current Player: {{ currentPlayerFaction }}</div>
+      Current Player: {{ currentPlayerFaction }}
+    </div>
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display rigth -->
       <div class="col-start-1">
