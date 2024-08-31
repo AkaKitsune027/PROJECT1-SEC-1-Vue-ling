@@ -1,7 +1,9 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+
+import { ref, computed, onMounted, watch } from 'vue'
+
 import Mouse from './classes/Mouse.js'
-import Card from './classes/Card.js';
+import Card from './classes/Card.js'
 
 // Current page
 const currentPage = ref('home')
@@ -23,6 +25,8 @@ const typesArray = [
 const cards = ref([])
 const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
+
+const previousPlayerFaction = ref('')
 const winner = ref(null)
 const winnerModalOpenState = ref(false)
 const winnerMessage = ref('') // New ref for winner message
@@ -90,9 +94,18 @@ const triggerCardEvent = (card) => {
   if (card.type === 'cat') {
     card.mouse = null
   } else if (card.type === 'spring') {
-    // implement spring logic
+    for (const card of cards.value.flat().filter(c => {
+      return (c.mouse && c.mouse.faction === currentPlayerFaction.value
+        && c.mouse !== selectedMouse.value)
+    })) {
+      card.mouse.isDisabled = true
+    }
+
+    card.mouse.disableCards.push(card)
+
   } else if (card.type === 'peanut') {
-    // implement peanut logic
+    selectedMouse.value.isDisabled = true
+
   } else if (card.type === 'glue') {
     // implement glue logic
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
@@ -118,8 +131,9 @@ const triggerCardEvent = (card) => {
 
     availablePlateCards[newMouseCardIndex].mouse = new Mouse(faction, 'soldier')
 
-  } else if (card.type === 'plate') {
-    // implement plate logic
+  }
+  if (card.type !== 'spring') {
+    selectedMouse.value.disableCards = []
   }
 }
 
@@ -127,6 +141,7 @@ const triggerCardEvent = (card) => {
  * Switch turn between white and black
  */
 function switchTurn() {
+  if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 }
 
@@ -140,12 +155,28 @@ const handleSelectCard = async (selectedCard) => {
   if (selectedCard.mouse !== null && selectedCard.mouse.faction === currentPlayerFaction.value) {
     selectedMouse.value = selectedCard.mouse
   } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
-    if (await selectedMouse.value.moveTo(selectedCard)) { // If the move is successful, switch turn.
+    if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
+
+      const currentPlayerMouses = []
+
+      for (const c of cards.value.flat()) {
+        if (c.mouse && c.mouse.faction === currentPlayerFaction.value) {
+          currentPlayerMouses.push(c.mouse)
+        }
+        continue
+      }
+
+      for (const m of currentPlayerMouses) {
+        m.isDisabled = false
+        // m.disableCards = []
+      }
+
       triggerCardEvent(selectedCard)
-      selectedMouse.value = null
       switchTurn()
+      selectedMouse.value = null
     }
   }
+
 }
 
 /**
@@ -272,7 +303,9 @@ const handleWinnerModalBackToMenu = () => {
     </div>
     <div class="flex justify-center items-end h-24 text-5xl w-screen text-slate-50 font-sigmar">Cheese Kingdom</div>
     <div class="text-center text-2xl font-bold text-white mb-4">
-      Current Player: {{ currentPlayerFaction }}</div><!--แสดง turn-->
+      <!--แสดง turn-->
+      Current Player: {{ currentPlayerFaction }}
+    </div>
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display rigth -->
       <div class="col-start-1">

@@ -18,7 +18,7 @@ export default class Mouse {
         this.type = type
         this.isDisabled = false
         this.isStucked = false
-        this.disableCard = []
+        this.disableCards = []
 
         this._card = null
     }
@@ -87,7 +87,7 @@ export default class Mouse {
             return false
         }
 
-        if (this.disableCard.includes(newCard)) {
+        if (this.disableCards.includes(newCard)) {
             return false
         }
 
