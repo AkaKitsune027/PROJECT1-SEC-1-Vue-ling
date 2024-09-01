@@ -25,12 +25,17 @@ const typesArray = [
 const cards = ref([])
 const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
-
-const previousPlayerFaction = ref('')
-const winner = ref(null)
 const winnerModalOpenState = ref(false)
 const manaulModalOpenState = ref(false)
 const winnerMessage = ref('') // New ref for winner message
+const playerStuckedMouse = ref({
+  'white': null,
+  'black': null
+})
+const playerStuckModal = ref({
+  'white': false,
+  'black': false
+})
 
 const usedCheeses = ref({
   'white': {
@@ -108,7 +113,8 @@ const triggerCardEvent = (card) => {
     selectedMouse.value.isDisabled = true
 
   } else if (card.type === 'glue') {
-    // implement glue logic
+    selectedMouse.value.isStucked = true
+    playerStuckedMouse.value[currentPlayerFaction.value] = selectedMouse.value
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
 
     const faction = currentPlayerFaction.value
@@ -144,6 +150,17 @@ const triggerCardEvent = (card) => {
 function switchTurn() {
   if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
+  
+  if (playerStuckedMouse.value[currentPlayerFaction.value]) {
+    playerStuckModal.value[currentPlayerFaction.value] = true
+  }
+}
+
+const handleStuckModalSubmit = () => {
+  playerStuckedMouse.value[currentPlayerFaction.value].isStucked = false
+  playerStuckedMouse.value[currentPlayerFaction.value] = null
+  playerStuckModal.value[currentPlayerFaction.value] = false
+  switchTurn()
 }
 
 /**
@@ -169,7 +186,6 @@ const handleSelectCard = async (selectedCard) => {
 
       for (const m of currentPlayerMouses) {
         m.isDisabled = false
-        // m.disableCards = []
       }
 
       triggerCardEvent(selectedCard)
@@ -270,25 +286,58 @@ const toggleManaulModal = () => {
           <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6 h-80 overflow-scroll">
             Tab content 2
           </div>
-
-
         </div>
       </div>
     </div>
   </div>
 
-  <!-- End game modal-->
+  <!-- white stuck modal -->
+  <transition>
+    <div v-if="playerStuckModal.white"
+      class="inset-0 fixed top-0 z-50 bg-[#00000039] grid place-items-center backdrop-blur-sm">
+      <div
+      class="bg-gray-600 bg-opacity-70 w-96 h-96 rounded-3xl flex flex-col items-center justify-center border-[0.5rem] border-white modal-content">
+      <img src="/a-stop-sign.png" alt="stop-sign" class="rounded-lg w-28 h-28 my-3 border border-white"></img>  
+      <div class="grid text-center font-sigmar">
+          <span class="text-3xl md:text-5xl lg:text-6xl text-white drop-shadow-[0_6px_0px_rgba(255,255,255,0.5)]">{{ currentPlayerFaction }}</span>
+          <span class="text-xl mt-4 text-white"> is stuck! Skip turn to black</span>
+        </div>
+        <div class="flex flex-row items-center justify-center gap-10">
+          <button @click="handleStuckModalSubmit" class="flex w-full justify-center rounded-md mt-6 px-8 py-1.5 bg-[#ff4f0f] text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#ff6d38] hover:scale-110 transition duration-300 ease-in-out">OK</button>
+        </div>
+      </div>
+    </div>
+  </transition>
+
+  <!-- black stuck modal -->
+  <transition>
+    <div v-if="playerStuckModal.black"
+      class="inset-0 fixed top-0 z-50 bg-[#00000039] grid place-items-center backdrop-blur-sm">
+      <div
+        class="bg-gray-400 bg-opacity-90 w-96 h-96 rounded-3xl flex flex-col items-center justify-center border-[0.5rem] border-gray-800 modal-content">
+      <img src="/a-stop-sign.png" alt="stop-sign" class="rounded-lg w-28 h-28 my-3 border border-white"></img>  
+        <div class="grid text-center font-sigmar">
+          <span class="text-3xl md:text-5xl lg:text-6xl text-gray-700 drop-shadow-[0px_6px_0px_#626f84]">{{ currentPlayerFaction }}</span>
+          <span class="text-xl mt-4 text-gray-700"> is stuck! Skip turn to white</span>
+        </div>
+        <div class="flex flex-row items-center justify-center gap-10">
+          <button @click="handleStuckModalSubmit" class="flex w-full justify-center rounded-md mt-6 px-8 py-1.5 bg-[#ff4f0f] text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#ff6d38] hover:scale-110 transition duration-300 ease-in-out">OK</button>
+        </div>
+      </div>
+    </div>
+  </transition>
+
+  <!-- End game modal -->
   <div v-if="winnerModalOpenState" class="inset-0 fixed top-0 z-50 bg-[#0008] grid place-items-center backdrop-blur-sm">
     <div
       class="bg-amber-200 w-96 h-72 rounded-3xl flex flex-col items-center justify-center border-[1rem] border-amber-500 modal-content">
       <div class="grid text-center drop-shadow-[0px_8px_0px_#FFEFBBFF] font-sigmar">
-        <span class="text-4xl md:text-6xl lg:text-7xl text-[#FF4500] animate-bounce">{{ winnerMessage }}</span>
+        <span class="text-4xl md:text-6xl lg:text-7xl text-[#ff8d63] animate-bounce">{{ winnerMessage }}</span>
         <span class="text-3xl md:text-5xl lg:text-6xl text-[#FF4500] animate-bounce">Win</span>
       </div>
       <div class="flex flex-row items-center justify-center gap-10">
         <button @click="handleWinnerModalBackToMenu" class="btn bg-gray-700 mt-4 text-white">Back to Menu</button>
       </div>
-
     </div>
   </div>
 
@@ -385,17 +434,19 @@ const toggleManaulModal = () => {
               card.isReveal && card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
               card.isReveal && card.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : '',
 
-              card.type?.includes('cheese') ? 'bg-yellow-500' : '',// for dev
+              card.type?.includes('cheese') ? 'bg-yellow-400' : '',// for dev
               card.type?.includes('cat') ? 'bg-red-500' : '',// for dev
               card.type?.includes('plate') ? 'bg-white' : '',// for dev
               card.type?.includes('peanut') ? 'bg-orange-400' : '',// for dev
-              card.type?.includes('spring') ? 'bg-lime-500' : ''
+              card.type?.includes('spring') ? 'bg-lime-500' : '',
+              card.type?.includes('glue') ? 'bg-purple-500' : ''
             ]">
             <div v-if="card.mouse" :class="{
               'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
               'bg-[url(/king-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'king',
               'bg-[url(/soldier-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'soldier',
-              'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier'
+              'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier',
+              'opacity-60': card.mouse.isStucked
             }" class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
             </div>
           </div>
@@ -424,4 +475,14 @@ const toggleManaulModal = () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>
