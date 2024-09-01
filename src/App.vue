@@ -29,6 +29,7 @@ const currentPlayerFaction = ref('white')
 const previousPlayerFaction = ref('')
 const winner = ref(null)
 const winnerModalOpenState = ref(false)
+const manaulModalOpenState = ref(false)
 const winnerMessage = ref('') // New ref for winner message
 
 const usedCheeses = ref({
@@ -231,12 +232,55 @@ const handleWinnerModalBackToMenu = () => {
 
   winnerModalOpenState.value = false
 }
+
+const toggleManaulModal = () => {
+  manaulModalOpenState.value = !manaulModalOpenState.value
+}
 </script>
 
 <template>
+  <!-- manaul modal-->
+  <div v-if="manaulModalOpenState" class="grid place-items-center inset-0 fixed top-0 z-50 bg-[#0008] backdrop-blur-sm">
+    <div class="bg-amber-200 w-[40rem] h-[30rem] rounded-3xl  border-[1rem] border-amber-500 modal-content relative">
+
+      <!-- ปุ่มปิด ('X') -->
+      <button @click="manaulModalOpenState = false"
+        class="absolute top-4 right-4 text-white text-xl font-bold bg-red-500 w-10 h-10 rounded-full ">
+        X
+      </button>
+      <div class="m-10 ">
+
+        <div role="tablist" class="tabs tabs-lifted">
+          <input type="radio" name="my_tabs_2" role="tab"
+            class="tab [--tab-bg:#da9f1f] [--tab-border-color:black] whitespace-nowrap" aria-label="How to play"
+            checked />
+          <div role="tabpanel" class="tab-content bg-[#da9f1f] border-[black] rounded-box p-6 h-80 overflow-scroll">
+            Tab content 1
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero quia cumque eos quidem quas adipisci
+            excepturi ratione sequi inventore voluptatibus, ea similique earum assumenda illum maiores, necessitatibus
+            tempora, labore dolore corporis qui laudantium. Rerum natus sunt voluptatibus dignissimos ipsa tempore
+            necessitatibus, sapiente aspernatur eum ipsum voluptate id odit quis quaerat expedita quo ea. Quis nesciunt,
+            sed asperiores doloremque voluptatem impedit obcaecati! A delectus, facere officia recusandae magni eaque ut
+            obcaecati aliquid deserunt iusto voluptates possimus cumque atque perferendis omnis. Adipisci alias fugit
+            cupiditate sapiente natus animi? Sunt error quidem ullam tenetur alias soluta. Nobis cupiditate dolorem quas
+            impedit? Rerum, sequi.
+          </div>
+
+          <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Cards" />
+          <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6 h-80 overflow-scroll">
+            Tab content 2
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- End game modal-->
   <div v-if="winnerModalOpenState" class="inset-0 fixed top-0 z-50 bg-[#0008] grid place-items-center backdrop-blur-sm">
-    <div class="bg-amber-200 w-96 h-72 rounded-3xl flex flex-col items-center justify-center border-[1rem] border-amber-500 modal-content">
+    <div
+      class="bg-amber-200 w-96 h-72 rounded-3xl flex flex-col items-center justify-center border-[1rem] border-amber-500 modal-content">
       <div class="grid text-center drop-shadow-[0px_8px_0px_#FFEFBBFF] font-sigmar">
         <span class="text-4xl md:text-6xl lg:text-7xl text-[#FF4500] animate-bounce">{{ winnerMessage }}</span>
         <span class="text-3xl md:text-5xl lg:text-6xl text-[#FF4500] animate-bounce">Win</span>
@@ -264,7 +308,7 @@ const handleWinnerModalBackToMenu = () => {
             class="bg-white rounded-lg text-lg md:text-xl lg:text-2xl shadow-md h-12 md:h-16 w-40 md:w-48 lg:w-56 text-green-600">
             PLAY GAME
           </button>
-          <button
+          <button @click="manaulModalOpenState = true"
             class="bg-white rounded-lg text-lg md:text-xl lg:text-2xl shadow-md h-12 md:h-16 w-40 md:w-48 lg:w-56 text-slate-500">
             HOW TO PLAY
           </button>
@@ -286,9 +330,9 @@ const handleWinnerModalBackToMenu = () => {
           <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4z" />
         </svg>
       </div>
-      <div class="m-2 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="white" class="bi bi-info-circle-fill"
-          viewBox="0 0 16 16">
+      <div @click="manaulModalOpenState = true" class="m-2 cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="white"
+          class="bi bi-info-circle-fill hover:fill-gray-500  " viewBox="0 0 16 16">
           <path
             d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2" />
         </svg>
