@@ -45,6 +45,8 @@ const usedCheeses = ref({
   }
 })
 
+const manualSelectedTab = ref(0)
+
 /**
  * Setup the board
  */
@@ -169,7 +171,6 @@ const handleSelectCard = async (selectedCard) => {
 
       for (const m of currentPlayerMouses) {
         m.isDisabled = false
-        // m.disableCards = []
       }
 
       triggerCardEvent(selectedCard)
@@ -240,40 +241,88 @@ const toggleManaulModal = () => {
 
 <template>
   <!-- manaul modal-->
-  <div v-if="manaulModalOpenState" class="grid place-items-center inset-0 fixed top-0 z-50 bg-[#0008] backdrop-blur-sm">
-    <div class="bg-amber-200 w-[40rem] h-[30rem] rounded-3xl  border-[1rem] border-amber-500 modal-content relative">
 
-      <!-- ปุ่มปิด ('X') -->
-      <button @click="manaulModalOpenState = false"
-        class="absolute top-4 right-4 text-white text-xl font-bold bg-red-500 w-10 h-10 rounded-full ">
-        X
-      </button>
-      <div class="m-10 ">
-
-        <div role="tablist" class="tabs tabs-lifted">
-          <input type="radio" name="my_tabs_2" role="tab"
-            class="tab [--tab-bg:#da9f1f] [--tab-border-color:black] whitespace-nowrap" aria-label="How to play"
-            checked />
-          <div role="tabpanel" class="tab-content bg-[#da9f1f] border-[black] rounded-box p-6 h-80 overflow-scroll">
-            Tab content 1
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Libero quia cumque eos quidem quas adipisci
-            excepturi ratione sequi inventore voluptatibus, ea similique earum assumenda illum maiores, necessitatibus
-            tempora, labore dolore corporis qui laudantium. Rerum natus sunt voluptatibus dignissimos ipsa tempore
-            necessitatibus, sapiente aspernatur eum ipsum voluptate id odit quis quaerat expedita quo ea. Quis nesciunt,
-            sed asperiores doloremque voluptatem impedit obcaecati! A delectus, facere officia recusandae magni eaque ut
-            obcaecati aliquid deserunt iusto voluptates possimus cumque atque perferendis omnis. Adipisci alias fugit
-            cupiditate sapiente natus animi? Sunt error quidem ullam tenetur alias soluta. Nobis cupiditate dolorem quas
-            impedit? Rerum, sequi.
+  <div v-if="manaulModalOpenState" class="fixed inset-0 z-50 bg-[#0008] backdrop-blur-sm grid place-items-center">
+    <div class="bg-amber-200 w-[50rem] h-[30rem] rounded-3xl border-[1rem] border-amber-500">
+      <header class="h-[6rem]">
+        <div class="text-4xl bg-amber-500 text-white font-semibold h-full flex items-center justify-center">Game
+          Manual</div>
+      </header>
+      <section class="h-[calc(100%-6rem)]">
+        <div class="h-[2rem] flex translate-y-[2px]">
+          <div @click="manualSelectedTab = 0" :class="manualSelectedTab === 0 ? 'bg-amber-500' : 'bg-base-100'"
+            class="rounded-t-lg border-2 border-b-0 px-5 py-1 text-zinc-800 select-none cursor-pointer">
+            How to play
           </div>
-
-          <input type="radio" name="my_tabs_2" role="tab" class="tab" aria-label="Cards" />
-          <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6 h-80 overflow-scroll">
-            Tab content 2
+          <div @click="manualSelectedTab = 1" :class="manualSelectedTab === 1 ? 'bg-amber-500' : 'bg-base-100'"
+            class="rounded-t-lg border-2 border-b-0 px-5 py-1 select-none cursor-pointer">
+            Cards
           </div>
-
-
         </div>
-      </div>
+        <article v-show="manualSelectedTab === 0"
+          class="h-[calc(100%-2rem)] overflow-auto bg-amber-300 border-2 rounded-[0rem_.5rem_.5rem_.5rem]">
+          <div class="bg-slate-100">
+          </div>
+
+          <content class="text-stone-900">
+            <div class="m-4">
+              <p class=" text-2xl text-orange-600 flex flex-col items-center justify-center bg-yellow-100 border-2 border-yellow-500 rounded-lg font-bold h-12
+                w-[50%]">
+                Goal / How you can win </p>
+            </div>
+            <div class="m-3">
+              <p>[รูป] กำจัดหนูทั้งหมดบนกระดานของหนูจักรวรรดิฝั่งตรงข้าม</p>
+              <p>[รูป] กำจัดราชาจักรวรรดิฝั่งตรงข้าม</p>
+            </div>
+
+            <div class="m-4">
+              <p
+                class="text-xl font-bold bg-yellow-100 rounded-lg w-[20%] flex items-center justify-center border-2 border-yellow-500 h-12 my-3">
+                Mouse </p>
+              <p>เมื่อเกมเริ่มขึ้น เกมจะมีหนู 2 ฝั่ง โดยแต่ละฝั่งจะมีหนูอยู่ฝั่งละ 3 ตัวด้วยกัน
+                โดยหนูแต่ละตัวมีความแตกต่างกันดังนี้</p>
+              <p class="font-bold m-3">The king mouse</p>
+              <div class="flex my-4 space-x-10">
+                <div class="text-center">
+                  <img src=" /king-black.png" alt="king-black" class="w-28 rounded-lg border-orange-400 border-4">
+                  <b class="text-white bg-gray-900 rounded-lg p-2 border-orange-400 border-2">Black king</b>
+                </div>
+                <div class="text-center">
+                  <img src="/king-white.png" alt="king-white" class="w-28 rounded-lg border-orange-400 border-4">
+                  <b class="text-gray-900 bg-white rounded-lg p-2 border-orange-400 border-2">White king</b>
+                </div>
+              </div>
+              <div class="bg-white w-full border rounded-lg p-3">
+                เป็นหนูราชาของจักรวรรดิ โดยมีหน้าที่ไม่ต่างจากทหารหนูตัวอื่น ๆ ในจักรววรดิมากนัก
+                แต่ด้วยความเป็นราชาที่มีภาระอันยิ่งใหญ่ ถ้าหากอยู่ในสถานะ <b class="text-red-500">'ตาย'</b> จักรวรรดิ
+                พื้นที่ และชัยชนะจะถูกช่วงชิง
+                และ <b class="text-red-500"> แพ้เกมในทันที </b>
+              </div>
+
+              <p class="font-bold m-3">The soldier mouse</p>
+              <div class="flex my-4 space-x-10">
+                <div class="text-center">
+                  <img src="/soldier-black.png" alt="soldier-black" class="w-28 rounded-lg border-orange-400 border-4">
+                  <b class="text-white bg-gray-900 rounded-lg p-2 border-orange-400 border-2">White soldier</b>
+                </div>
+                <div class="text-center">
+                  <img src="/soldier-white.png" alt="soldier-white" class="w-28 rounded-lg border-orange-400 border-4">
+                  <b class="text-gray-900 bg-white rounded-lg p-2 border-orange-400 border-2">Black soldier</b>
+                </div>
+              </div>
+              <div class="bg-white w-full border rounded-lg p-3">เป็นหนูทหารของจักรวรรดิ
+                โดยมีหน้าที่ช่วยกันปกป้องราชาจากอันตราย
+                และสามารถ <b class="text-red-500">ฆ่าราชาของจักรวรรดิฝั่งตรงข้าม</b> เพื่อคว้าชัยชนะได้
+              </div>
+            </div>
+          </content>
+        </article>
+
+        <article v-show="manualSelectedTab === 1">
+          Tab 1
+        </article>
+
+      </section>
     </div>
   </div>
 
@@ -320,6 +369,16 @@ const toggleManaulModal = () => {
     <div class="-z-10 fixed w-screen h-screen bg-[#0002] backdrop-blur-sm"></div>
     <div class="-z-20 fixed bg-[url('/bg2.png')] bg-cover w-screen h-screen"></div>
     <!-- button menu -->
+    <div class="flex items-center fixed top-0 left-0">
+      <div class="m-2 cursor-pointer bg-slate-600 w-30 p-3 rounded-lg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-house-fill"
+          viewBox="0 0 16 16">
+          <path
+            d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z" />
+          <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z" />
+        </svg>
+      </div>
+    </div>
     <div class="flex items-center fixed top-0 right-0">
       <div class="m-2 cursor-pointer">
         <svg xmlns=" http://www.w3.org/2000/svg" width="35" height="35" fill="white" class="bi bi-music-note-fill"
@@ -331,22 +390,15 @@ const toggleManaulModal = () => {
         </svg>
       </div>
       <div @click="manaulModalOpenState = true" class="m-2 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="white"
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="35" fill="white"
           class="bi bi-info-circle-fill hover:fill-gray-500  " viewBox="0 0 16 16">
           <path
             d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16m.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2" />
         </svg>
       </div>
-      <div class="m-2 cursor-pointer">
-        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="white" class="bi bi-gear-fill"
-          viewBox="0 0 16 16">
-          <path
-            d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
-        </svg>
-      </div>
     </div>
-    <div class="flex justify-center items-end h-24 text-5xl w-screen text-slate-50 font-sigmar">Cheese Kingdom</div>
-    <div class="text-center text-2xl font-bold text-white mb-4">
+    <div class="flex justify-center items-end h-20 text-5xl w-screen text-slate-50 font-sigmar">Cheese Kingdom</div>
+    <div class="text-center text-2xl font-bold text-white mb-1">
       <!--แสดง turn-->
       Current Player: {{ currentPlayerFaction }}
     </div>
@@ -354,7 +406,7 @@ const toggleManaulModal = () => {
       <!-- UI mouse display rigth -->
       <div class="col-start-1">
         <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
-          <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
+          <img src="/grey_mouse.png" alt="greyMouse" class="rounded-md w-56 h-56 my-3 border border-white"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center gap-2 font-bold text-white text-3xl">
@@ -373,7 +425,7 @@ const toggleManaulModal = () => {
       <div class="grid grid-cols-1 grid-rows-6 w-fit col-start-2 col-span-2 gap-2 bg-[#E0DFD5] bg-opacity-30">
         <div v-for="(row, idx) in cards" :key="idx" class="grid grid-cols-6 grid-rows-1 gap-2">
           <div v-for="(card) in row" :key="card.id" @click="handleSelectCard(card)"
-            class="ck-card w-[95px] h-[95px] flex items-center justify-center border-2 border-white bg-cover hover:border-green-500"
+            class="ck-card w-[95px] h-[95px] flex items-center justify-center rounded-lg border-2 border-white bg-cover hover:border-green-500"
             :class="[
               !card.isReveal ? 'bg-gray-800' : '',
               card.isReveal && card.type === 'plate' ? 'bg-[url(/plate.png)]' : '',
