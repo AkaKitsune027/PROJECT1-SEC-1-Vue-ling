@@ -350,11 +350,11 @@ const toggleManaulModal = () => {
     <div
       class="bg-amber-200 w-96 h-72 rounded-3xl flex flex-col items-center justify-center border-[1rem] border-amber-500 modal-content">
       <div class="grid text-center drop-shadow-[0px_8px_0px_#FFEFBBFF] font-sigmar">
-        <span class="text-4xl md:text-6xl lg:text-7xl text-[#ff8d63] animate-bounce">{{ winnerMessage }}</span>
+        <span class="text-4xl md:text-6xl lg:text-7xl text-[#FF4500] animate-bounce">{{ winnerMessage }}</span>
         <span class="text-3xl md:text-5xl lg:text-6xl text-[#FF4500] animate-bounce">Win</span>
       </div>
       <div class="flex flex-row items-center justify-center gap-10">
-        <button @click="handleWinnerModalBackToMenu" class="btn bg-gray-700 mt-4 text-white">Back to Menu</button>
+        <button @click="handleWinnerModalBackToMenu" class="flex w-full h-10 justify-center rounded-md mt-6 px-8 py-1.5 bg-neutral-500 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-neutral-600 hover:scale-110 transition duration-300 ease-in-out">Back to Menu</button>
       </div>
     </div>
   </div>
@@ -364,11 +364,12 @@ const toggleManaulModal = () => {
       class="inset-0 fixed top-0 z-50 bg-[#00000039] grid place-items-center backdrop-blur-sm">
       <div
         class="bg-amber-200 bg-opacity-90 w-96 h-96 rounded-3xl flex flex-col items-center justify-center border-[0.5rem] border-amber-300 modal-content">
-        <img src="/broken-plate.png" alt="stop-sign" class="rounded-lg w-28 h-28 my-3 border border-white"></img>
+        <img src="/broken-plate.png" alt="stop-sign" class="rounded-lg w-28 h-28 my-1 border border-white"></img>
         <div class="grid text-center font-sigmar">
 
-          <span class="text-xl mt-4 text-amber-500"> No plate!</span>
-          <span class="text-xl mt-4 text-amber-500"> Try again next time</span>
+          <span class="text-2xl mt-2 text-orange-600">No plate!</span>
+          <span class="text-lg mt-2 text-amber-600">soldier mouse can't spawn without a reveal plate card</span>
+          <span class="text-sm mt-3 text-neutral-500">(this cheese type can still be used)</span>
         </div>
         <div class="flex flex-row items-center justify-center gap-10">
           <button @click="nopalteToUseCheeseModal = false"
