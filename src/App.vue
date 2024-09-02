@@ -144,7 +144,7 @@ const triggerCardEvent = (card) => {
     const availablePlateCards = cards.value.flat().filter(c => c.isReveal && c.type === 'plate' && c.mouse === null)
 
     if (availablePlateCards.length === 0) {
-      nopalteToUseCheeseModal.value = true
+      noplateToUseCheeseModal.value = true
       return
     }
 
