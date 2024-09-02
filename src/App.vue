@@ -28,6 +28,9 @@ const currentPlayerFaction = ref('white')
 const winnerModalOpenState = ref(false)
 const manaulModalOpenState = ref(false)
 const winnerMessage = ref('') // New ref for winner message
+
+const highlightedCells = ref([])
+
 const playerStuckedMouse = ref({
   'white': null,
   'black': null
@@ -183,6 +186,8 @@ const handleSelectCard = async (selectedCard) => {
   // If selected card has a mouse and it belongs to the current player, select it.
   if (selectedCard.mouse !== null && selectedCard.mouse.faction === currentPlayerFaction.value) {
     selectedMouse.value = selectedCard.mouse
+    highlightedCells.value = calculatePossibleMoves(selectedCard)
+
   } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
     if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
 
@@ -202,9 +207,37 @@ const handleSelectCard = async (selectedCard) => {
       triggerCardEvent(selectedCard)
       switchTurn()
       selectedMouse.value = null
+
+      highlightedCells.value = []
     }
   }
 
+}
+
+const calculatePossibleMoves = (card) => {
+  const possibleMoves = []
+  // สมมุติว่าเมาส์สามารถเคลื่อนที่ไปได้ในตำแหน่งที่อยู่ใกล้ๆ
+  const directions = [
+    { r: -1, c: 0 }, { r: 1, c: 0 }, // up, down
+    { r: 0, c: -1 }, { r: 0, c: 1 }, // left, right
+    { r: -1, c: -1 }, { r: -1, c: 1 }, // top-left, top-right
+    { r: 1, c: -1 }, { r: 1, c: 1 }  // bottom-left, bottom-right
+  ]
+  const cardRow = cards.value.findIndex(row => row.includes(card))
+  const cardCol = cards.value[cardRow].indexOf(card)
+
+  directions.forEach(({ r, c }) => {
+    const newRow = cardRow + r
+    const newCol = cardCol + c
+    if (newRow >= 0 && newRow < 6 && newCol >= 0 && newCol < 6) {
+      const moveCard = cards.value[newRow][newCol]
+      if (moveCard.mouse === null) { // Check if the cell is empty
+        possibleMoves.push(moveCard)
+      }
+    }
+  })
+
+  return possibleMoves
 }
 
 /**
@@ -448,7 +481,11 @@ const toggleManaulModal = () => {
               card.isReveal && card.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
               card.isReveal && card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               card.isReveal && card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
-              card.isReveal && card.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : ''
+              card.isReveal && card.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : '',
+
+              
+              highlightedCells.includes(card) ? 'bg-green-800' : ''
+
             ]">
             <div v-if="card.mouse" :class="{
               'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
