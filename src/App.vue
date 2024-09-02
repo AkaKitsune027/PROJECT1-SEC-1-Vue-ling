@@ -27,7 +27,7 @@ const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
 const winnerModalOpenState = ref(false)
 const manaulModalOpenState = ref(false)
-const nopalteToUseCheeseModal = ref(false)
+const noplateToUseCheeseModal = ref(false)
 const useSameCheeseModal = ref(false)
 const winnerMessage = ref('') // New ref for winner message
 const playerStuckedMouse = ref({
@@ -360,7 +360,7 @@ const toggleManaulModal = () => {
   </div>
 
   <transition>
-    <div v-if="nopalteToUseCheeseModal"
+    <div v-if="noplateToUseCheeseModal"
       class="inset-0 fixed top-0 z-50 bg-[#00000039] grid place-items-center backdrop-blur-sm">
       <div
         class="bg-amber-200 bg-opacity-90 w-96 h-96 rounded-3xl flex flex-col items-center justify-center border-[0.5rem] border-amber-300 modal-content">
@@ -372,7 +372,7 @@ const toggleManaulModal = () => {
           <span class="text-sm mt-3 text-neutral-500">(this cheese type can still be used)</span>
         </div>
         <div class="flex flex-row items-center justify-center gap-10">
-          <button @click="nopalteToUseCheeseModal = false"
+          <button @click="noplateToUseCheeseModal = false"
             class="flex w-full justify-center rounded-md mt-6 px-8 py-1.5 bg-[#ff4f0f] text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#ff6d38] hover:scale-110 transition duration-300 ease-in-out">OK</button>
         </div>
       </div>
