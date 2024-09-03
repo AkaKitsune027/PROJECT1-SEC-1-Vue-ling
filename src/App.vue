@@ -459,7 +459,7 @@ const toggleManaulModal = () => {
   </div>
 
   <div v-if="currentPage === 'home'">
-    <div class="w-screen h-screen bg-[url('/bg-main-menu.png')] bg-no-repeat bg-cover">
+    <div class="w-screen h-screen bg-[url('/bg-main-menu.png')] bg-no-repeat bg-cover bg-center">
       <div class="grid grid-rows-2 grid-flow-col gap-4 font-sigmar">
         <div class="grid text-center mt-20 md:mt-36 drop-shadow-[0px_8px_0px_#FFEFBBFF]">
           <span class="text-5xl md:text-7xl lg:text-8xl text-[#313638]">CHEESE</span>
@@ -553,12 +553,6 @@ const toggleManaulModal = () => {
               card.isReveal && card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               card.isReveal && card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
               card.isReveal && card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : '',
-
-              card.type?.includes('cheese') ? 'bg-yellow-500' : '',// for dev
-              card.type?.includes('cat') ? 'bg-red-500' : '',// for dev
-              card.type?.includes('plate') ? 'bg-white' : '',// for dev
-              card.type?.includes('peanut') ? 'bg-orange-400' : '',// for dev
-              card.type?.includes('spring') ? 'bg-lime-500' : ''
             ]">
             <div v-if="card.mouse" :class="{
               'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
