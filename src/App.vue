@@ -177,6 +177,7 @@ const triggerCardEvent = (card) => {
     if (playerStuckedMouse.value[opponentFaction] && playerStuckedMouse.value[opponentFaction].card.id === card.id) {
       playerStuckedMouse.value[opponentFaction] = null
     }
+
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
 
     const faction = currentPlayerFaction.value
@@ -531,9 +532,11 @@ const toggleManaulModal = () => {
       Current Player: {{ currentPlayerFaction }}
     </div>
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
-      <!-- UI mouse display rigth -->
+      <!-- UI mouse display right -->
       <div class="col-start-1">
-        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
+        <div
+          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+          :class="currentPlayerFaction === 'white' ? 'animate-glowing' : 'normal'">
           <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
@@ -542,9 +545,9 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalWhiteMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['swiss-cheese'] }">
+                <img src="/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -553,7 +556,7 @@ const toggleManaulModal = () => {
       <div class="grid grid-cols-1 grid-rows-6 w-fit col-start-2 col-span-2 gap-2 bg-[#E0DFD5] bg-opacity-30">
         <div v-for="(row, idx) in cards" :key="idx" class="grid grid-cols-6 grid-rows-1 gap-2">
           <div v-for="(card) in row" :key="card.id" @click="handleSelectCard(card)"
-            class="ck-card w-[95px] h-[95px] flex items-center justify-center border-2 border-white bg-cover hover:border-green-500"
+            class="ck-card w-[95px] h-[95px] flex items-center justify-center rounded-lg border-2 border-white bg-cover hover:border-green-500"
             :class="[
               !card.isReveal ? 'bg-gray-800' : '',
               card.isReveal && card.type === 'plate' ? 'bg-[url(/plate.png)]' : '',
@@ -577,9 +580,11 @@ const toggleManaulModal = () => {
           </div>
         </div>
       </div>
-      <!-- UI mouse display left-->
+      <!-- UI mouse display left -->
       <div class="col-start-4">
-        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
+        <div 
+          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+          :class="currentPlayerFaction === 'black' ? 'animate-glowing' : 'normal'">
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
@@ -588,9 +593,9 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalBlackMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['swiss-cheese'] }">
+                <img src="/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -609,5 +614,27 @@ const toggleManaulModal = () => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+.animate-glowing {
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+  transform: scale(1.1);
+  opacity: 1;
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.25);
+  } to {
+    box-shadow: 0 0 35px 10px rgba(255, 255, 255, 0.75);
+  }
+}
+
+.normal {
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+  transform: scale(1);
+  opacity: 0.90;
+  filter: saturate(0.5);
 }
 </style>
