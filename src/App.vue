@@ -53,6 +53,23 @@ const usedCheeses = ref({
   }
 })
 
+// const mice = ref([]); // ตรวจสอบว่าค่าของ mice ถูกตั้งไว้ที่นี่
+// console.log('Initial mice:', mice.value)
+
+// const selectMouse = (mouse) => {
+//   console.log('Mouse selected:', mouse)
+//   selectedMouse.value = mouse
+//   console.log('Selected mouse after setting:', selectedMouse.value)
+// }
+
+// watch(selectedMouse, (newMouse) => {
+//   console.log('Selected mouse updated:', newMouse)
+// })
+
+// function handleSelectMouse(mouse) {
+//   selectedMouse.value = mouse;
+// }
+
 /**
  * Setup the board
  */
@@ -183,12 +200,11 @@ const handleStuckModalSubmit = () => {
  */
 const handleSelectCard = async (selectedCard) => {
 
-  // If selected card has a mouse and it belongs to the current player, select it.
-  if (selectedCard.mouse !== null && selectedCard.mouse.faction === currentPlayerFaction.value) {
+  // If selected card has a mouse that it belongs to the current player and not in disable state, select it.
+  if (selectedCard.mouse && selectedCard.mouse.faction === currentPlayerFaction.value && selectedCard.mouse.isDisabled === false) {
     selectedMouse.value = selectedCard.mouse
-    highlightedCells.value = calculatePossibleMoves(selectedCard)
 
-  } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
+  } else if (selectedMouse.value) { // If a mouse is selected, move it to the selected card.
     if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
 
       const currentPlayerMouses = []
@@ -207,37 +223,9 @@ const handleSelectCard = async (selectedCard) => {
       triggerCardEvent(selectedCard)
       switchTurn()
       selectedMouse.value = null
-
-      highlightedCells.value = []
     }
   }
 
-}
-
-const calculatePossibleMoves = (card) => {
-  const possibleMoves = []
-  // สมมุติว่าเมาส์สามารถเคลื่อนที่ไปได้ในตำแหน่งที่อยู่ใกล้ๆ
-  const directions = [
-    { r: -1, c: 0 }, { r: 1, c: 0 }, // up, down
-    { r: 0, c: -1 }, { r: 0, c: 1 }, // left, right
-    { r: -1, c: -1 }, { r: -1, c: 1 }, // top-left, top-right
-    { r: 1, c: -1 }, { r: 1, c: 1 }  // bottom-left, bottom-right
-  ]
-  const cardRow = cards.value.findIndex(row => row.includes(card))
-  const cardCol = cards.value[cardRow].indexOf(card)
-
-  directions.forEach(({ r, c }) => {
-    const newRow = cardRow + r
-    const newCol = cardCol + c
-    if (newRow >= 0 && newRow < 6 && newCol >= 0 && newCol < 6) {
-      const moveCard = cards.value[newRow][newCol]
-      if (moveCard.mouse === null) { // Check if the cell is empty
-        possibleMoves.push(moveCard)
-      }
-    }
-  })
-
-  return possibleMoves
 }
 
 /**
@@ -297,6 +285,7 @@ const handleWinnerModalBackToMenu = () => {
 const toggleManaulModal = () => {
   manaulModalOpenState.value = !manaulModalOpenState.value
 }
+
 </script>
 
 <template>
@@ -484,16 +473,21 @@ const toggleManaulModal = () => {
               card.isReveal && card.type === 'cat' ? 'bg-[url(/angry-cat-hunt-mouse.png)]' : '',
 
               
-              highlightedCells.includes(card) ? 'bg-green-800' : ''
+              selectedMouse?.availableMoves.includes(card.id) && selectedMouse.validateMove(card) ? 'highlight-card' : '',
 
             ]">
-            <div v-if="card.mouse" :class="{
-              'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
-              'bg-[url(/king-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'king',
-              'bg-[url(/soldier-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'soldier',
-              'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier',
-              'opacity-60': card.mouse.isStucked,
-              'border-red-500': card.mouse.isDisabled
+            <div :class="{
+              'opacity-0': !card.mouse,
+              'opacity-100': card.mouse,
+              'bg-[url(/king-black.png)]': card.mouse?.faction === 'black' && card.mouse?.type === 'king',
+              'bg-[url(/king-white.png)]': card.mouse?.faction === 'white' && card.mouse?.type === 'king',
+              'bg-[url(/soldier-black.png)]': card.mouse?.faction === 'black' && card.mouse?.type === 'soldier',
+              'bg-[url(/soldier-white.png)]': card.mouse?.faction === 'white' && card.mouse?.type === 'soldier',
+              'ck-stucked': card.mouse?.isStucked,
+              'border-red-500 border-4 box-content': card.mouse?.isDisabled,
+              'border-green-500 border-4 box-content': card.mouse === selectedMouse,
+              'scale-110': card.mouse === selectedMouse,
+              'scale-90 opacity-50': selectedMouse && card.mouse?.faction === selectedMouse?.faction && card.mouse !== selectedMouse,
             }" class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
             </div>
           </div>
@@ -523,6 +517,29 @@ const toggleManaulModal = () => {
 </template>
 
 <style scoped>
+/* .highlight-card:after {
+  content: '';
+  position: absolute;
+  width: 95px;
+  height: 95px;
+  border-radius: 10%;
+  border: 1rem dashed #06e4279e;
+} */
+
+.ck-mouse {
+  transition: transform 300ms ease, border 100ms ease;
+}
+
+.ck-mouse.ck-stucked {
+  transform: rotate(180deg);
+  box-sizing: content-box;
+  border: 8px solid #ceb723;
+}
+
+.mouse-enter-from {
+  transform: rotate(0deg);
+}
+
 .v-enter-active,
 .v-leave-active {
   transition: opacity 0.3s ease;
@@ -532,4 +549,24 @@ const toggleManaulModal = () => {
 .v-leave-to {
   opacity: 0;
 }
+
+.highlight-card:after {
+  content: '';
+  position: absolute;
+  width: 4rem;
+  height: 4rem;
+  background-image: url(/move-marker.png);
+  background-position: center;
+  animation: zoom 1s infinite;
+}
+
+@keyframes zoom {
+  0%, 100% {
+    transform: scale(.9);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+
 </style>
