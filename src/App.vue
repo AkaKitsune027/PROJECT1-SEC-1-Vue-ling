@@ -14,10 +14,6 @@ sfxAudioSource.volume = 0.15
 
 const isBgmPlaying = ref(false)
 
-// const isRed = ref(false)
-
-
-
 function playSound(type, src) {
   if (type === 'bgm') {
     isBgmPlaying.value = true
@@ -73,7 +69,7 @@ const cards = ref([])
 const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
 const winnerModalOpenState = ref(false)
-const manaulModalOpenState = ref(false)
+const manualModalOpenState = ref(false)
 const noplateToUseCheeseModal = ref(false)
 const useSameCheeseModal = ref(false)
 const winnerMessage = ref('') // New ref for winner message
