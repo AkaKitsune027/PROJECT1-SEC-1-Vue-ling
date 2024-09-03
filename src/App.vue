@@ -129,6 +129,7 @@ const triggerCardEvent = (card) => {
     if (playerStuckedMouse.value[opponentFaction] && playerStuckedMouse.value[opponentFaction].card.id === card.id) {
       playerStuckedMouse.value[opponentFaction] = null
     }
+
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
 
     const faction = currentPlayerFaction.value
@@ -416,9 +417,11 @@ const toggleManaulModal = () => {
       Current Player: {{ currentPlayerFaction }}
     </div>
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
-      <!-- UI mouse display rigth -->
+      <!-- UI mouse display right -->
       <div class="col-start-1">
-        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
+        <div
+          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+          :class="currentPlayerFaction === 'white' ? 'glowing' : 'normal'">
           <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
@@ -462,9 +465,11 @@ const toggleManaulModal = () => {
           </div>
         </div>
       </div>
-      <!-- UI mouse display left-->
+      <!-- UI mouse display left -->
       <div class="col-start-4">
-        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
+        <div 
+          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+          :class="currentPlayerFaction === 'black' ? 'glowing' : 'normal'">
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
@@ -494,5 +499,26 @@ const toggleManaulModal = () => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+.glowing {
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+  transform: scale(1.1);
+  opacity: 1;
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.25);
+  } to {
+    box-shadow: 0 0 35px 10px rgba(255, 255, 255, 0.75);
+  }
+}
+
+.normal {
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+  transform: scale(1);
+  opacity: 0.85;
 }
 </style>
