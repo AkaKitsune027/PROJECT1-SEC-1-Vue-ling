@@ -412,7 +412,7 @@ const toggleManaulModal = () => {
               </div>
             </div>
 
-            <img src="/spring.png" alt="spring" class="border-red-500 border-4 rounded-lg">
+            <img src="/spring.png" alt="spring" class="border-green-400 border-4 rounded-lg">
             <div class="bg-slate-50 rounded-lg px-4 py-3">
               <strong class="text-lg">Spring card: การ์ดสปริง</strong>
               <div>
@@ -424,7 +424,7 @@ const toggleManaulModal = () => {
               </div>
             </div>
 
-            <img src="/peanut.png" alt="peanut" class="border-red-500 border-4 rounded-lg">
+            <img src="/peanut.png" alt="peanut" class="border-green-400 border-4 rounded-lg">
             <div class="bg-slate-50 rounded-lg px-4 py-3">
               <strong class="text-lg">Peanut card: การ์ดถั่ว หรือ การ์ดสั่งการ</strong>
               <div>
