@@ -148,6 +148,7 @@ function switchTurn() {
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 }
 
+let selectMouse
 /**
  * This function is called when a card is clicked.
  * @param {Card} selectedCard - The card that was clicked
@@ -172,6 +173,7 @@ const handleSelectCard = async (selectedCard) => {
       for (const m of currentPlayerMouses) {
         m.isDisabled = false
       }
+
 
       triggerCardEvent(selectedCard)
       switchTurn()
@@ -241,16 +243,16 @@ const toggleManaulModal = () => {
 
 <template>
   <!-- manual modal-->
-
   <div v-if="manualModalOpenState" class="fixed inset-0 z-50 bg-[#0008] backdrop-blur-sm grid place-items-center">
     <div class="bg-amber-200 w-[50rem] h-[30rem] rounded-3xl border-[1rem] border-amber-500">
 
-      <header class="h-[6rem] justify-center">
-        <div class="text-4xl bg-amber-500 text-white w-full h-full flex items-center justify-center font-sigmar">
-          Game Manual
-          <div>
-            <div class="flex justify-center bg-red-600 w-16 rounded-2xl"> X </div>
-          </div>
+      <header class="h-[6rem]">
+        <div
+          class="text-4xl bg-amber-500 text-white w-full h-full flex items-center justify-center font-sigmar relative">
+          <div>Game Manual</div>
+          <button @click="toggleManaulModal"
+            class="flex justify-center bg-red-500 w-24 rounded-2xl absolute top-0 right-0"> X
+          </button>
         </div>
       </header>
       <section class="h-[calc(100%-6rem)]">
@@ -271,9 +273,10 @@ const toggleManaulModal = () => {
                 w-[50%]">
             Goal / How you can win </p>
           <div class="m-4">
-            <span>[รูป] กำจัดหนูทั้งหมดบนกระดานของหนูจักรวรรดิฝั่งตรงข้าม</span>
-            <span>[รูป]
-              กำจัดราชาจักรวรรดิฝั่งตรงข้าม</span>
+            <div>คุณสามารถชนะได้ด้วยวิธีใดด้วยวิธีหนึ่งจากวิธีต่อไปนี้</div>
+            <span class="text-red-600">[รูป]กำจัดหนูทั้งหมดบนกระดาน</span>ของหนูอาณาจักรฝั่งตรงข้าม
+            <div class="text-red-600">[รูป]กำจัดราชาหนูอาณาจักรฝั่งตรงข้าม</div>
+            <span class="text-red-600">[รูป] ราชาหนูอาณาจักรตรงข้ามโดนแมวกิน </span>
           </div>
 
           <div class="m-4">
@@ -281,8 +284,13 @@ const toggleManaulModal = () => {
               class="text-xl font-bold bg-yellow-100 rounded-lg w-[20%] flex items-center justify-center border-2 border-yellow-500 h-12 my-3">
               Mouse </span>
             <span>เมื่อเกมเริ่มขึ้น เกมจะมีหนู 2 ฝั่ง โดยแต่ละฝั่งจะมีหนูอยู่ฝั่งละ 3 ตัวด้วยกัน
-              โดยหนูแต่ละตัวมีความแตกต่างกันดังนี้</span>
-            <p class="font-bold m-3">The king mouse</p>
+              โดยหนูแต่ละตัวมีความแตกต่างกัน ดังนี้</span>
+            <div class="flex gap-2 my-4">
+              <img src="/crown.png" alt="crown" class="w-6 h-6 flex justify-center self-center" />
+              <p class="font-bold text-lg m-3">
+                The king mouse
+              </p>
+            </div>
             <div class="flex my-4 space-x-10">
               <div class="text-center">
                 <img src=" /king-black.png" alt="king-black" class="w-28 rounded-lg border-orange-400 border-4">
@@ -294,13 +302,18 @@ const toggleManaulModal = () => {
               </div>
             </div>
             <div class="bg-white w-full border rounded-lg p-3">
-              เป็นหนูราชาของจักรวรรดิ โดยมีหน้าที่ไม่ต่างจากทหารหนูตัวอื่น ๆ ในจักรววรดิมากนัก
-              แต่ด้วยความเป็นราชาที่มีภาระอันยิ่งใหญ่ ถ้าหากอยู่ในสถานะ <b class="text-red-500">'ตาย'</b> จักรวรรดิ
+              เป็นราชาหนูหนูของอาณาจักร โดยมีหน้าที่ไม่ต่างจากทหารหนูตัวอื่น ๆ ในจักรววรดิมากนัก
+              แต่ด้วยความเป็นราชาหนูที่มีภาระอันยิ่งใหญ่ ถ้าหากอยู่ในสถานะ <b class="text-red-500">'ตาย'</b> อาณาจักร
               พื้นที่ และชัยชนะจะถูกช่วงชิง
-              และ <b class="text-red-500"> แพ้เกมในทันที </b>
+              และ อาณาจักรของคุณ<b class="text-red-500"> แพ้เกมในทันที </b>
             </div>
 
-            <p class="font-bold m-3">The soldier mouse</p>
+            <div class="flex gap-2 my-4">
+              <img src="/soldier.png" alt="soldier" class="w-8 h-8 justify-center items-center self-center" />
+              <p class="font-bold text-lg m-3 ">
+                The soldier mouse
+              </p>
+            </div>
             <div class="flex my-4 space-x-10">
               <div class="text-center">
                 <img src="/soldier-black.png" alt="soldier-black" class="w-28 rounded-lg border-orange-400 border-4">
@@ -311,9 +324,9 @@ const toggleManaulModal = () => {
                 <b class="text-gray-900 bg-white rounded-lg p-2 border-orange-400 border-2">Black soldier</b>
               </div>
             </div>
-            <div class="bg-white w-full border rounded-lg p-3">เป็นหนูทหารของจักรวรรดิ
-              โดยมีหน้าที่ช่วยกันปกป้องราชาจากอันตราย
-              และสามารถ <b class="text-red-500">ฆ่าราชาของจักรวรรดิฝั่งตรงข้าม</b> เพื่อคว้าชัยชนะได้
+            <div class="bg-white w-full border rounded-lg p-3">เป็นทหารหนูของอาณาจักร
+              โดยมีหน้าที่ช่วยกันปกป้องราชาหนูหนูจากอันตราย
+              และสามารถ <b class="text-red-500">ฆ่าราชาหนูของอาณาจักรฝั่งตรงข้าม</b> เพื่อคว้าชัยชนะได้
             </div>
           </div>
         </article>
@@ -327,22 +340,103 @@ const toggleManaulModal = () => {
             <div
               class=" text-2xl text-orange-600 flex flex-col items-center justify-center bg-yellow-100 border-2 border-yellow-500 rounded-lg font-bold">
               Effect</div>
-            <img src="/plate.png" alt="plate" class="border-white border-2 rounded-lg">
+            <img src="/plate.png" alt="plate" class="border-white border-4 rounded-lg">
             <div class="bg-slate-50 rounded-lg px-4 py-3">
-              <strong>Plate card: การ์ดพื้นที่พัก</strong>
+              <strong class="text-lg">Plate card: การ์ดพื้นที่พัก</strong>
               <div>
-                effect -- การ์ดนี้จะถูกใช้เมื่อ 'หนูตัวใดก็ได้' เหยียบการ์ดจาน ซึ่งจะไม่มีผลอะไรกับหนูทุกตัว
-                ลืงก์การ์ด: [cheese card] [link ให้ไปอ่านชีสการ์ด]
+                เมื่อหนูเหยียบการ์ดจานจะไม่มีผลใด ๆ และจบตาทันที
+                แต่การ์ดจานที่ว่างอยู่จะสามารถเป็นจุดเรียกทหารหนูตัวใหม่มาเพิ่มจากความสามารถของการ์ดชีสได้
+                <p>ลิงก์การ์ด: <span class="font-bold">[cheese card]</span></p>
+                <p class="text-purple-600">การ์ดจานมีทั้งหมด 10 ใบ</p>
               </div>
             </div>
 
-            <img src="/swiss-cheese.png" alt="swiss-cheese" class="border-white border-2 rounded-lg">
-            <div class="bg-slate-50 rounded-lg">
-              <span>Cheese card: การ์ดชีส / การ์ดเรียกกำลังพล</span>
+            <img src="/swiss-cheese.png" alt="swiss-cheese" class="border-green-400 border-4 rounded-lg">
+            <div class="bg-slate-50 rounded-lg px-4 py-3">
+              <strong class="text-lg">Cheese card: การ์ดชีส หรือ การ์ดเรียกกำลังพล</strong>
               <div>
-                effect -- การ์ดนี้จะถูกใช้เมื่อ 'หนูราชา' มีการเหยียบชีสการ์ด ราชาจะเรียกหนูทหารได้
+                การ์ดนี้จะถูกใช้เมื่อ 'ราชาหนูหนู' มีการเหยียบการ์ดชีส ราชาหนูจะเรียกทหารหนูได้
+                ประเภทชีสมีทั้งหมด 3 แบบ
+                <div class="grid">
+                  <div class="flex gap-6">
+                    <div class="flex flex-col items-center">
+                      <img src="/gouda-cheese.png" alt="gouda-cheese" class="w-28 rounded-lg">
+                      <div>Gouda cheese</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <img src="/cheddar-cheese.png" alt="cheddar-cheese" class="w-28 rounded-lg">
+                      <div>Cheddar cheese</div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                      <img src="/swiss-cheese.png" alt="swiss-cheese" class="w-28 rounded-lg">
+                      <div>Swiss cheese</div>
+                    </div>
+                  </div>
+                  <div class="my-3">โดยมีกรณีใช้ ดังนี้
+                    เมื่อราชาหนูเหยียบลงบนการ์ดชีส
+                    ราชาหนูจะสามารถเรียกทหารหนูมาเพิ่มมาบนการ์ดจานที่ถูกเปิดเผยแล้วและว่างอยู่แบบสุ่มได้
+                    ซึ่งชีสชนิดที่ถูกใช้แล้ว
+                    จะไม่สามารถใช้งานได้อีกในเกมนั้น
+                    <p>แต่ถ้าหากไม่มีการ์ดจานที่สามารถเรียกทหารหนูได้ จะจบตานั้นทันที โดยไม่นับว่าชีสชนิดนั้นถูกใช้งาน
+                    </p>
+                    <p class="text-purple-600">การ์ดชีสแต่ละชนิดมี 2 ใบ รวมชีสทุกชนิดมีทั้งหมดรวม 6 ใบ</p>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <img src="/glue-mouse-trap.png" alt="glue-mouse-trap" class="border-yellow-200 border-4 rounded-lg">
+            <div class="bg-slate-50 rounded-lg px-4 py-3">
+              <strong class="text-lg"> Glue trap card: การ์ดกาวดักหนู</strong>
+              <div>
+                การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดกาวดักหนู
+                จะทำให้หนูตัวนั้นอยู่ในสถานะติดอยู่กับที่
+                สถานะมีทั้งหมด 3 สถานะ
+                <div class="grid">
+                  <div>[รูป] ติดกาว</div>
+                  <div>[รูป] พยายามออกจากกาว</div>
+                  <div>[รูป] ออกจากกาวและเดินเกมต่อได้</div>
+                  <p class="text-purple-600">การ์ดกาวมีทั้งหมด 4 ใบ</p>
+                </div>
+              </div>
+            </div>
+
+            <img src="/cat-card.png" alt="cat-card" class="border-red-500 border-4 rounded-lg">
+            <div class="bg-slate-50 rounded-lg px-4 py-3">
+              <strong class="text-lg">Cat card: การ์ดแมว</strong>
+              <div>
+                การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดแมว หนูตัวนั้นจะอยู่ในสถานะ 'ตาย' ทันที
+                [รูป] ทหารหนูตาย และ ราชาหนูตาย
+                <div class="text-red-600">* Warning: ถ้าราชาหนูหนูตาย อาณาจักรนั้น ๆ จะแพ้ทันที !! *</div>
+                <p class="text-purple-600">การ์ดจานมีทั้งหมด 3 ใบ</p>
+              </div>
+            </div>
+
+            <img src="/spring.png" alt="spring" class="border-red-500 border-4 rounded-lg">
+            <div class="bg-slate-50 rounded-lg px-4 py-3">
+              <strong class="text-lg">Spring card: การ์ดสปริง</strong>
+              <div>
+                การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดสปริง หนูตัวนั้นจะสามารถเดินได้ 2 ครั้ง
+                แต่หนูตัวนั้นจะไม่สามารถกระโดดกลับไปยังสปริงที่เพิ่งเดินผ่านมาได้ (เดินไปและเดินกลับ)
+                แต่ถ้าหากไม่สามารถไปที่การ์ดใด ๆ ได้ สามารถเดินกลับสปริงได้ในกรณีพิเศษ
+                <div class="text-red-600">[รูปถูก] [รูปผิด]</div>
+                <p class="text-purple-600">การ์ดสปริงมีทั้งหมด 7 ใบ</p>
+              </div>
+            </div>
+
+            <img src="/peanut.png" alt="peanut" class="border-red-500 border-4 rounded-lg">
+            <div class="bg-slate-50 rounded-lg px-4 py-3">
+              <strong class="text-lg">Peanut card: การ์ดถั่ว หรือ การ์ดสั่งการ</strong>
+              <div>
+                การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดถั่ว หนูตัวนั้นจะทำหน้าที่ <span class="font-">'สั่งการ'</span>
+                เท่านั้น
+                โดยตัวมันจะไม่สามารถเดินได้ในตานั้น แต่จะสามารถสั่งการให้หนูตัวอื่นในฝั่งตัวเองเดินได้ 1 ตา
+                <div class="text-gray-700 italic">แต่ถ้าหาก ไม่มีทหารหนูอยู่ในบนกระดานแล้ว
+                  การ์ดนี้จะถือเป็นการ์ดปกติที่ไม่มีผลใด ๆ ทันที</div>
+                <p class="text-purple-600">การ์ดถั่วมีทั้งหมด 6 ใบ</p>
+              </div>
+            </div>
+
           </div>
         </article>
       </section>
@@ -363,8 +457,6 @@ const toggleManaulModal = () => {
 
     </div>
   </div>
-
-
 
   <div v-if="currentPage === 'home'">
     <div class="w-screen h-screen bg-[url('/bg-main-menu.png')] bg-no-repeat bg-cover">
@@ -454,8 +546,8 @@ const toggleManaulModal = () => {
             :class="[
               !card.isReveal ? 'bg-gray-800' : '',
               card.isReveal && card.type === 'plate' ? 'bg-[url(/plate.png)]' : '',
-              card.isReveal && card.type === 'spring' ? 'bg-[url(/grey-coil-spring.png)]' : '',
-              card.isReveal && card.type === 'peanut' ? 'bg-[url(/ground-nut.png)]' : '',
+              card.isReveal && card.type === 'spring' ? 'bg-[url(/spring.png)]' : '',
+              card.isReveal && card.type === 'peanut' ? 'bg-[url(/peanut.png)]' : '',
               card.isReveal && card.type === 'cheddar-cheese' ? 'bg-[url(/cheddar-cheese.png)]' : '',
               card.isReveal && card.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
               card.isReveal && card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
