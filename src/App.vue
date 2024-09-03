@@ -5,6 +5,53 @@ import { ref, computed, onMounted, watch } from 'vue'
 import Mouse from './classes/Mouse.js'
 import Card from './classes/Card.js'
 
+//sounds
+const bgmAudioSource = new Audio()
+bgmAudioSource.volume = 0.15
+
+const sfxAudioSource = new Audio()
+sfxAudioSource.volume = 0.15
+
+const isBgmPlaying = ref(false)
+
+// const isRed = ref(false)
+
+
+
+function playSound(type, src) {
+  if (type === 'bgm') {
+    isBgmPlaying.value = true
+    bgmAudioSource.src = src
+    bgmAudioSource.loop = true
+    bgmAudioSource.play()
+  } else {
+    sfxAudioSource.src = src
+    sfxAudioSource.loop = false
+    sfxAudioSource.play()
+  }
+}
+
+function stopSound(type) {
+  if (type === 'bgm') {
+    bgmAudioSource.pause()
+    bgmAudioSource.currentTime = 0
+  } else {
+    sfxAudioSource.pause()
+    sfxAudioSource.currentTime = 0
+  }
+}
+
+function toggleBgm() {
+  if (isBgmPlaying.value) {
+    bgmAudioSource.pause()
+  } else {
+    bgmAudioSource.play()
+  }
+  isBgmPlaying.value = !isBgmPlaying.value
+
+  isRed.value = !isRed.value
+}
+
 // Current page
 const currentPage = ref('home')
 
@@ -25,12 +72,19 @@ const typesArray = [
 const cards = ref([])
 const selectedMouse = ref(null)
 const currentPlayerFaction = ref('white')
-
-const previousPlayerFaction = ref('')
-const winner = ref(null)
 const winnerModalOpenState = ref(false)
-const manualModalOpenState = ref(false)
+const manaulModalOpenState = ref(false)
+const noplateToUseCheeseModal = ref(false)
+const useSameCheeseModal = ref(false)
 const winnerMessage = ref('') // New ref for winner message
+const playerStuckedMouse = ref({
+  'white': null,
+  'black': null
+})
+const playerStuckModal = ref({
+  'white': false,
+  'black': false
+})
 
 const usedCheeses = ref({
   'white': {
@@ -72,6 +126,7 @@ function setupBoard() {
     }
     cards.value.push(row)
   }
+
   isBoardLoading.value = false
 }
 
@@ -94,6 +149,8 @@ const totalBlackMouses = computed(() => {
  * @param {Card} card - The card that was clicked
  */
 const triggerCardEvent = (card) => {
+  if (card.type !== 'spring') selectedMouse.value.disableCards = []
+
   if (card.type === 'cat') {
     card.mouse = null
   } else if (card.type === 'spring') {
@@ -106,37 +163,46 @@ const triggerCardEvent = (card) => {
 
     card.mouse.disableCards.push(card)
 
+    if (card.mouse.availableMoves.every(cardId => card.mouse.validateMove(cards.value.flat()[cardId]) === false)) {
+      selectedMouse.value.disableCards = []
+    }
+
   } else if (card.type === 'peanut') {
     selectedMouse.value.isDisabled = true
 
   } else if (card.type === 'glue') {
-    // implement glue logic
+    selectedMouse.value.isStucked = true
+    playerStuckedMouse.value[currentPlayerFaction.value] = selectedMouse.value
+
+    const opponentFaction = currentPlayerFaction.value === 'white' ? 'black' : 'white'
+
+    if (playerStuckedMouse.value[opponentFaction] && playerStuckedMouse.value[opponentFaction].card.id === card.id) {
+      playerStuckedMouse.value[opponentFaction] = null
+    }
+
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
 
     const faction = currentPlayerFaction.value
     const cheeseType = card.type
 
     if (usedCheeses.value[faction][cheeseType]) {
-      alert('ชีสนี้ใช้แล้วจ้า')
+      useSameCheeseModal.value = true
       return
     }
 
     const availablePlateCards = cards.value.flat().filter(c => c.isReveal && c.type === 'plate' && c.mouse === null)
 
     if (availablePlateCards.length === 0) {
-      alert('No plate')
+      noplateToUseCheeseModal.value = true
       return
     }
 
-    usedCheeses.value[faction][cheeseType] = true
-
-    const newMouseCardIndex = availablePlateCards.length > 1 ? Math.round(Math.random() * availablePlateCards.length) : 0
+    const newMouseCardIndex = availablePlateCards.length > 1 ? Math.round(Math.random() * (availablePlateCards.length - 1)) : 0
 
     availablePlateCards[newMouseCardIndex].mouse = new Mouse(faction, 'soldier')
 
-  }
-  if (card.type !== 'spring') {
-    selectedMouse.value.disableCards = []
+    if (availablePlateCards[newMouseCardIndex].mouse) usedCheeses.value[faction][cheeseType] = true
+
   }
 }
 
@@ -146,6 +212,17 @@ const triggerCardEvent = (card) => {
 function switchTurn() {
   if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
+
+  if (playerStuckedMouse.value[currentPlayerFaction.value]) {
+    playerStuckModal.value[currentPlayerFaction.value] = true
+  }
+}
+
+const handleStuckModalSubmit = () => {
+  playerStuckedMouse.value[currentPlayerFaction.value].isStucked = false
+  playerStuckedMouse.value[currentPlayerFaction.value] = null
+  playerStuckModal.value[currentPlayerFaction.value] = false
+  switchTurn()
 }
 
 let selectMouse
@@ -188,7 +265,12 @@ const handleSelectCard = async (selectedCard) => {
  */
 const startGame = () => {
   setupBoard()
+  currentPlayerFaction.value = Math.random() < 0.5 ? 'white' : 'black'
   currentPage.value = 'game' // Switch to game page
+
+  playSound('bgm', '/sounds/background-sound.mp3')
+
+
 }
 
 // Computed properties to check for king mice existence
@@ -201,6 +283,11 @@ const kingsExist = computed(() => ({
 function showWinnerModal(message) {
   winnerMessage.value = message
   winnerModalOpenState.value = true
+
+  stopSound('bgm')
+  playSound('sfx', '/sounds/winner-sound.mp3')
+
+
 }
 
 // Function to check game over conditions
@@ -443,7 +530,47 @@ const toggleManaulModal = () => {
     </div>
   </div>
 
-  <!-- End game modal-->
+  <!-- white stuck modal -->
+  <transition>
+    <div v-if="playerStuckModal.white"
+      class="inset-0 fixed top-0 z-50 bg-[#00000039] grid place-items-center backdrop-blur-sm">
+      <div
+        class="bg-gray-600 bg-opacity-70 w-96 h-96 rounded-3xl flex flex-col items-center justify-center border-[0.5rem] border-white modal-content">
+        <img src="/a-stop-sign.png" alt="stop-sign" class="rounded-lg w-28 h-28 my-3 border border-white"></img>
+        <div class="grid text-center font-sigmar">
+          <span class="text-3xl md:text-5xl lg:text-6xl text-white drop-shadow-[0_6px_0px_rgba(255,255,255,0.5)]">{{
+            currentPlayerFaction }}</span>
+          <span class="text-xl mt-4 text-white"> is stuck! Skip turn to black</span>
+        </div>
+        <div class="flex flex-row items-center justify-center gap-10">
+          <button @click="handleStuckModalSubmit"
+            class="flex w-full justify-center rounded-md mt-6 px-8 py-1.5 bg-[#ff4f0f] text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#ff6d38] hover:scale-110 transition duration-300 ease-in-out">OK</button>
+        </div>
+      </div>
+    </div>
+  </transition>
+
+  <!-- black stuck modal -->
+  <transition>
+    <div v-if="playerStuckModal.black"
+      class="inset-0 fixed top-0 z-50 bg-[#00000039] grid place-items-center backdrop-blur-sm">
+      <div
+        class="bg-gray-400 bg-opacity-90 w-96 h-96 rounded-3xl flex flex-col items-center justify-center border-[0.5rem] border-gray-800 modal-content">
+        <img src="/a-stop-sign.png" alt="stop-sign" class="rounded-lg w-28 h-28 my-3 border border-white"></img>
+        <div class="grid text-center font-sigmar">
+          <span class="text-3xl md:text-5xl lg:text-6xl text-gray-700 drop-shadow-[0px_6px_0px_#626f84]">{{
+            currentPlayerFaction }}</span>
+          <span class="text-xl mt-4 text-gray-700"> is stuck! Skip turn to white</span>
+        </div>
+        <div class="flex flex-row items-center justify-center gap-10">
+          <button @click="handleStuckModalSubmit"
+            class="flex w-full justify-center rounded-md mt-6 px-8 py-1.5 bg-[#ff4f0f] text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#ff6d38] hover:scale-110 transition duration-300 ease-in-out">OK</button>
+        </div>
+      </div>
+    </div>
+  </transition>
+
+  <!-- End game modal -->
   <div v-if="winnerModalOpenState" class="inset-0 fixed top-0 z-50 bg-[#0008] grid place-items-center backdrop-blur-sm">
     <div
       class="bg-amber-200 w-96 h-72 rounded-3xl flex flex-col items-center justify-center border-[1rem] border-amber-500 modal-content">
@@ -452,11 +579,51 @@ const toggleManaulModal = () => {
         <span class="text-3xl md:text-5xl lg:text-6xl text-[#FF4500] animate-bounce">Win</span>
       </div>
       <div class="flex flex-row items-center justify-center gap-10">
-        <button @click="handleBackToMenu" class="btn bg-gray-700 mt-4 text-white">Back to Menu</button>
+        <button @click="handleBackToMenu"
+          class="flex w-full h-10 justify-center rounded-md mt-6 px-8 py-1.5 bg-neutral-500 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-neutral-600 hover:scale-110 transition duration-300 ease-in-out">Back
+          to Menu</button>
       </div>
-
     </div>
   </div>
+
+  <transition>
+    <div v-if="noplateToUseCheeseModal"
+      class="inset-0 fixed top-0 z-50 bg-[#00000039] grid place-items-center backdrop-blur-sm">
+      <div
+        class="bg-amber-200 bg-opacity-90 w-96 h-96 rounded-3xl flex flex-col items-center justify-center border-[0.5rem] border-amber-300 modal-content">
+        <img src="/broken-plate.png" class="rounded-lg w-28 h-28 my-1 border border-white"></img>
+        <div class="grid text-center font-sigmar">
+
+          <span class="text-2xl mt-2 text-orange-600">No plate!</span>
+          <span class="text-lg mt-2 text-amber-600">soldier mouse can't spawn without a reveal plate card</span>
+          <span class="text-sm mt-3 text-neutral-500">(this cheese type can still be used)</span>
+        </div>
+        <div class="flex flex-row items-center justify-center gap-10">
+          <button @click="noplateToUseCheeseModal = false"
+            class="flex w-full justify-center rounded-md mt-6 px-8 py-1.5 bg-[#ff4f0f] text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#ff6d38] hover:scale-110 transition duration-300 ease-in-out">OK</button>
+        </div>
+      </div>
+    </div>
+  </transition>
+
+  <transition>
+    <div v-if="useSameCheeseModal"
+      class="inset-0 fixed top-0 z-50 bg-[#00000039] grid place-items-center backdrop-blur-sm">
+      <div
+        class="bg-amber-200 bg-opacity-90 w-96 h-96 rounded-3xl flex flex-col items-center justify-center border-[0.5rem] border-amber-300 modal-content">
+        <img src="/no-cheese.png" class="rounded-lg w-28 h-28 my-3 border border-white"></img>
+        <div class="grid text-center font-sigmar">
+
+          <span class="text-xl mt-4 text-amber-500"> You have already used</span>
+          <span class="text-xl mt-4 text-amber-500"> this type of cheese</span>
+        </div>
+        <div class="flex flex-row items-center justify-center gap-10">
+          <button @click="useSameCheeseModal = false"
+            class="flex w-full justify-center rounded-md mt-6 px-8 py-1.5 bg-[#ff4f0f] text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#ff6d38] hover:scale-110 transition duration-300 ease-in-out">OK</button>
+        </div>
+      </div>
+    </div>
+  </transition>
 
   <div v-if="currentPage === 'home'">
     <div class="w-screen h-screen bg-[url('/bg-main-menu.png')] bg-no-repeat bg-cover bg-center">
@@ -496,13 +663,28 @@ const toggleManaulModal = () => {
       </button>
     </div>
     <div class="flex items-center fixed top-0 right-0">
-      <div class="m-2 cursor-pointer">
-        <svg xmlns=" http://www.w3.org/2000/svg" width="35" height="35" fill="white" class="bi bi-music-note-fill"
-          viewBox="0 0 16 16">
+      <div @click="toggleBgm" class="m-2 cursor-pointer group">
+        <svg v-show="isBgmPlaying" class="group-hover:fill-slate-500" xmlns=" http://www.w3.org/2000/svg" width="35"
+          height="35" fill="white" viewBox="0 0 16 16">
           <path
             d="M6 13c0 1.105-1.12 2-2.5 2S1 14.105 1 13s1.12-2 2.5-2 2.5.896 2.5 2m9-2c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2 1.12-2 2.5-2 2.5.895 2.5 2" />
           <path fill-rule="evenodd" d="M14 11V2h1v9zM6 3v10H5V3z" />
           <path d="M5 2.905a1 1 0 0 1 .9-.995l8-.8a1 1 0 0 1 1.1.995V3L5 4z" />
+        </svg>
+        <svg v-show="!isBgmPlaying" class="group-hover:fill-slate-500" width="35" height="35" viewBox="0 0 35 35"
+          fill="#f44" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M13.125 28.4375C13.125 30.8547 10.675 32.8125 7.65626 32.8125C7.21095 32.8125 6.77803 32.7699 6.36351 32.6895C6.7751 32.4975 7.16075 32.2317 7.50049 31.892L10.9549 28.4375L12.6819 26.7105L13.125 26.2674V28.4375Z"
+            fill="white" />
+          <path
+            d="M6.08627 30.4777C5.30522 31.2588 4.03889 31.2588 3.25784 30.4777C2.4768 29.6967 2.4768 28.4304 3.25784 27.6493L6.79006 24.1171L10.9375 19.9696L13.125 17.7821L23.4038 7.50337L28.2649 2.64226L29.4208 1.48636C30.2018 0.705312 31.4682 0.705312 32.2492 1.48636C32.8638 2.10091 32.9948 3.01589 32.6422 3.75853C32.5467 3.95973 32.4157 4.14829 32.2492 4.31479L32.189 4.375L30.625 5.939L29.6892 6.87483L13.125 23.439L11.3511 25.2129L10.9375 25.6265L6.08627 30.4777Z"
+            fill-rule="evenodd" />
+          <path
+            d="M32.8125 24.0625C32.8125 26.4797 30.3625 28.4375 27.3438 28.4375C24.325 28.4375 21.875 26.4797 21.875 24.0625C21.875 21.6453 24.325 19.6875 27.3438 19.6875C28.5746 19.6875 29.7108 20.013 30.625 20.5623V8.76742L32.8125 6.57993V24.0625Z"
+            fill="white" />
+          <path
+            d="M10.9375 6.35468C10.9375 5.81239 11.1389 5.28943 11.5027 4.88725C11.8665 4.48507 12.3667 4.23235 12.9063 4.17812L25.1222 2.95653L20.2611 7.81764L13.125 8.53125V14.9537L10.9375 17.1412V8.75V6.5625V6.35468Z"
+            fill="white" />
         </svg>
       </div>
       <div @click="manualModalOpenState = true" class="m-2 cursor-pointer">
@@ -519,11 +701,15 @@ const toggleManaulModal = () => {
       <!--แสดง turn-->
       Current Player: {{ currentPlayerFaction }}
     </div>
-    <div class="h-[calc(100vh-10rem)] grid place-items-center grid-cols-4">
+
+    <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display right -->
       <div class="col-start-1">
-        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
-          <img src="/grey_mouse.png" alt="greyMouse" class="rounded-md w-56 h-56 my-3 border border-white"></img>
+        <div
+          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+          :class="currentPlayerFaction === 'white' ? 'animate-glowing' : 'normal'">
+          <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
+
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
               <div class="flex justify-center items-center gap-2 font-bold text-white text-3xl">
@@ -531,9 +717,9 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalWhiteMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['swiss-cheese'] }">
+                <img src="/cheddar.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -542,7 +728,7 @@ const toggleManaulModal = () => {
       <div class="grid grid-cols-1 grid-rows-6 w-fit col-start-2 col-span-2 gap-2 bg-[#E0DFD5] bg-opacity-30">
         <div v-for="(row, idx) in cards" :key="idx" class="grid grid-cols-6 grid-rows-1 gap-2">
           <div v-for="(card) in row" :key="card.id" @click="handleSelectCard(card)"
-            class="ck-card w-[82px] h-[82px] flex items-center justify-center rounded-lg border-2 border-white bg-cover hover:border-green-500"
+            class="ck-card w-[95px] h-[95px] flex items-center justify-center rounded-lg border-2 border-white bg-cover hover:border-green-500"
             :class="[
               !card.isReveal ? 'bg-gray-800' : '',
               card.isReveal && card.type === 'plate' ? 'bg-[url(/plate.png)]' : '',
@@ -552,21 +738,25 @@ const toggleManaulModal = () => {
               card.isReveal && card.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
               card.isReveal && card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               card.isReveal && card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
-              card.isReveal && card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : '',
+              card.isReveal && card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : ''
             ]">
             <div v-if="card.mouse" :class="{
               'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
               'bg-[url(/king-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'king',
               'bg-[url(/soldier-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'soldier',
-              'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier'
+              'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier',
+              'opacity-60': card.mouse.isStucked,
+              'border-red-500': card.mouse.isDisabled
             }" class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
             </div>
           </div>
         </div>
       </div>
-      <!-- UI mouse display left-->
+      <!-- UI mouse display left -->
       <div class="col-start-4">
-        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white">
+        <div 
+          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+          :class="currentPlayerFaction === 'black' ? 'animate-glowing' : 'normal'">
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
             <div class="flex flex-col space-y-4">
@@ -575,9 +765,9 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalBlackMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl">
-                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['swiss-cheese'] }">
+                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -587,4 +777,36 @@ const toggleManaulModal = () => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+.animate-glowing {
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+  transform: scale(1.1);
+  opacity: 1;
+  animation: glow 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.25);
+  } to {
+    box-shadow: 0 0 35px 10px rgba(255, 255, 255, 0.75);
+  }
+}
+
+.normal {
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+  transform: scale(1);
+  opacity: 0.90;
+  filter: saturate(0.5);
+}
+</style>

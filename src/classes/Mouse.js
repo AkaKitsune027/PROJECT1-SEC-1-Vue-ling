@@ -87,6 +87,10 @@ export default class Mouse {
             return false
         }
 
+        if (this.isStucked) {
+            return false
+        }
+
         if (this.disableCards.includes(newCard)) {
             return false
         }
