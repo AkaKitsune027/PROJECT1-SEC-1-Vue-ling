@@ -31,7 +31,7 @@ const noplateToUseCheeseModal = ref(false)
 const useSameCheeseModal = ref(false)
 const storyModal = ref(false)
 const winnerMessage = ref('') // New ref for winner message
-const playerStuckedMouse = ref({
+const playerStuckMouse = ref({
   'white': null,
   'black': null
 })
@@ -124,13 +124,13 @@ const triggerCardEvent = (card) => {
     selectedMouse.value.isDisabled = true
 
   } else if (card.type === 'glue') {
-    selectedMouse.value.isStucked = true
-    playerStuckedMouse.value[currentPlayerFaction.value] = selectedMouse.value
+    selectedMouse.value.isStuck = true
+    playerStuckMouse.value[currentPlayerFaction.value] = selectedMouse.value
 
     const opponentFaction = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 
-    if (playerStuckedMouse.value[opponentFaction] && playerStuckedMouse.value[opponentFaction].card.id === card.id) {
-      playerStuckedMouse.value[opponentFaction] = null
+    if (playerStuckMouse.value[opponentFaction] && playerStuckMouse.value[opponentFaction].card.id === card.id) {
+      playerStuckMouse.value[opponentFaction] = null
     }
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
 
@@ -165,14 +165,14 @@ function switchTurn() {
   if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 
-  if (playerStuckedMouse.value[currentPlayerFaction.value]) {
+  if (playerStuckMouse.value[currentPlayerFaction.value]) {
     playerStuckModal.value[currentPlayerFaction.value] = true
   }
 }
 
 const handleStuckModalSubmit = () => {
-  playerStuckedMouse.value[currentPlayerFaction.value].isStucked = false
-  playerStuckedMouse.value[currentPlayerFaction.value] = null
+  playerStuckMouse.value[currentPlayerFaction.value].isStuck = false
+  playerStuckMouse.value[currentPlayerFaction.value] = null
   playerStuckModal.value[currentPlayerFaction.value] = false
   switchTurn()
 }
@@ -536,7 +536,7 @@ const toggleManaulModal = () => {
               'bg-[url(/king-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'king',
               'bg-[url(/soldier-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'soldier',
               'bg-[url(/soldier-white.png)]': card.mouse.faction === 'white' && card.mouse.type === 'soldier',
-              'opacity-60': card.mouse.isStucked,
+              'opacity-60': card.mouse.isStuck,
               'border-red-500': card.mouse.isDisabled
             }" class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
             </div>
