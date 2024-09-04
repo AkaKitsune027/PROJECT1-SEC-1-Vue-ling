@@ -29,6 +29,7 @@ const winnerModalOpenState = ref(false)
 const manaulModalOpenState = ref(false)
 const noplateToUseCheeseModal = ref(false)
 const useSameCheeseModal = ref(false)
+const storyModal = ref(false)
 const winnerMessage = ref('') // New ref for winner message
 const playerStuckedMouse = ref({
   'white': null,
@@ -213,6 +214,7 @@ const handleSelectCard = async (selectedCard) => {
  * Start the game
  */
 const startGame = () => {
+  storyModal.value = true
   setupBoard()
   currentPlayerFaction.value = Math.random() < 0.5 ? 'white' : 'black'
   currentPage.value = 'game' // Switch to game page
@@ -229,6 +231,8 @@ function showWinnerModal(message) {
   winnerMessage.value = message
   winnerModalOpenState.value = true
 }
+
+
 
 // Function to check game over conditions
 function checkGameOver() {
@@ -266,6 +270,8 @@ const handleWinnerModalBackToMenu = () => {
 const toggleManaulModal = () => {
   manaulModalOpenState.value = !manaulModalOpenState.value
 }
+
+
 </script>
 
 <template>
@@ -354,7 +360,9 @@ const toggleManaulModal = () => {
         <span class="text-3xl md:text-5xl lg:text-6xl text-[#FF4500] animate-bounce">Win</span>
       </div>
       <div class="flex flex-row items-center justify-center gap-10">
-        <button @click="handleWinnerModalBackToMenu" class="flex w-full h-10 justify-center rounded-md mt-6 px-8 py-1.5 bg-neutral-500 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-neutral-600 hover:scale-110 transition duration-300 ease-in-out">Back to Menu</button>
+        <button @click="handleWinnerModalBackToMenu"
+          class="flex w-full h-10 justify-center rounded-md mt-6 px-8 py-1.5 bg-neutral-500 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-neutral-600 hover:scale-110 transition duration-300 ease-in-out">Back
+          to Menu</button>
       </div>
     </div>
   </div>
@@ -398,7 +406,37 @@ const toggleManaulModal = () => {
     </div>
   </transition>
 
+  <!-- Story Modal -->
+  <div v-if="storyModal" class="fixed inset-0 z-50 grid place-items-center  bg-black bg-opacity-50 ">
 
+    <div
+      class="bg-amber-100 border-[0.8rem] border-amber-500 p-5 rounded-lg w-6/12  h-3/5 md:h-4/5 grid grid-cols justify-center overflow-x-auto font-sigmar ">
+
+      <div class="flex flex-col items-center justify-center">
+        <h2 class="text-2xl font-bold text-[#65493e] animate-bounce"> Game Story</h2>
+        <img src="/game-story.png" alt="game-story"
+          class="rounded-lg w-52 h-32 bg-cover border border-white my-6 mx-4" />
+      </div>
+
+      <div class="text-center mx-4 font-serif font-medium">
+        <span class="text-lg text-gray-600 ">สมบัติ เกียรติยศ และชีส
+          สามสิ่งนี้เป็นสิ่งที่ประชาหนูทุกตัวแห่งอาณาจักรชีส
+          ต่างปรารถนา...
+          แต่น้ำนิ่งนั้นไหลลึก ภายใต้สันติสุขจอมปลอม ราชาขาว และ ราชาดำ
+          ทั้งสองได้ริเริ่มสงครามขึ้น
+          จะขาวหรือดำ จะชีสหรือเนย
+          มีเพียงผู้ชนะเท่านั้นที่จะได้เขียนประวัติศาสตร์ มาเถอะเหล่าผู้กล้าจงควบคุมพวกเราและคว้าชีสก้อนนั้นซะ!!!
+        </span>
+      </div>
+
+      <div class="flex flex-row ml-96 md:ml-[80%]">
+        <button @click="storyModal = false"
+          class="flex justify-end rounded-md mt-2 text-lg  text-gray-600 shadow-sm hover:text-[#34a169] hover:scale-110 transition duration-300 ease-in-out">Skip
+          >></button>
+      </div>
+
+    </div>
+  </div>
 
   <div v-if="currentPage === 'home'">
     <div class="w-screen h-screen bg-[url('/bg-main-menu.png')] bg-no-repeat bg-cover">
@@ -423,6 +461,8 @@ const toggleManaulModal = () => {
     </div>
   </div>
   <div v-else-if="currentPage === 'game'">
+
+
     <div class="-z-10 fixed w-screen h-screen bg-[#0002] backdrop-blur-sm"></div>
     <div class="-z-20 fixed bg-[url('/bg2.png')] bg-cover w-screen h-screen"></div>
     <!-- button menu -->
