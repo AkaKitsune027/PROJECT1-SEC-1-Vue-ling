@@ -43,8 +43,6 @@ function toggleBgm() {
     bgmAudioSource.play()
   }
   isBgmPlaying.value = !isBgmPlaying.value
-
-  isRed.value = !isRed.value
 }
 
 // Current page
@@ -73,8 +71,7 @@ const noplateToUseCheeseModal = ref(false)
 const useSameCheeseModal = ref(false)
 const storyModal = ref(false)
 const winnerMessage = ref('') // New ref for winner message
-
-const highlightedCells = ref([])
+const stopPlayerInteraction = ref(false)
 
 const playerStuckMouse = ref({
   'white': null,
@@ -249,6 +246,9 @@ let selectMouse
  * @param {Card} selectedCard - The card that was clicked
  */
 const handleSelectCard = async (selectedCard) => {
+  if (stopPlayerInteraction.value) return
+
+  stopPlayerInteraction.value = true
 
   // If selected card has a mouse that it belongs to the current player and not in disable state, select it.
   if (selectedCard.mouse && selectedCard.mouse.faction === currentPlayerFaction.value && selectedCard.mouse.isDisabled === false) {
@@ -267,6 +267,7 @@ const handleSelectCard = async (selectedCard) => {
     }
   }
 
+  stopPlayerInteraction.value = false
 }
 
 /**
@@ -372,7 +373,7 @@ const toggleManaulModal = () => {
         </div>
 
         <article v-show="manualSelectedTab === 0"
-          class="h-[calc(100%-2rem)] overflow-auto bg-amber-300 border-2 rounded-[0rem_.5rem_.5rem_.5rem] text-stone-900 p-4">
+          class="h-[calc(100%-2rem)] overflow-auto bg-amber-300 border-2 rounded-[0rem_.5rem_.5rem_.5rem] text-stone-900 p-4 font-mitr">
           <p class="m-4 text-2xl text-orange-600 flex flex-col items-center justify-center bg-yellow-100 border-2 border-yellow-500 rounded-lg font-bold h-12
                 w-[50%]">
             Goal / How you can win </p>
@@ -397,19 +398,25 @@ const toggleManaulModal = () => {
             </div>
             <div class="flex my-4 space-x-10">
               <div class="text-center">
-                <img src=" /king-black.png" alt="king-black" class="w-28 rounded-lg border-orange-400 border-4">
+                <div class="border-4 rounded-lg border-orange-400">
+                  <img src=" /king-black.png" alt="king-black" class="w-28 scale-[1.65]">
+                </div>
                 <b class="text-white bg-gray-900 rounded-lg p-2 border-orange-400 border-2">Black king</b>
               </div>
               <div class="text-center">
-                <img src="/king-white.png" alt="king-white" class="w-28 rounded-lg border-orange-400 border-4">
+                <div class="border-4 rounded-lg border-orange-400">
+                  <img src="/king-white.png" alt="king-white" class="w-28 scale-[1.65]">
+                </div>
                 <b class="text-gray-900 bg-white rounded-lg p-2 border-orange-400 border-2">White king</b>
               </div>
             </div>
             <div class="bg-white w-full border rounded-lg p-3">
-              เป็นราชาหนูหนูของอาณาจักร โดยมีหน้าที่ไม่ต่างจากทหารหนูตัวอื่น ๆ ในจักรววรดิมากนัก
-              แต่ด้วยความเป็นราชาหนูที่มีภาระอันยิ่งใหญ่ ถ้าหากอยู่ในสถานะ <b class="text-red-500">'ตาย'</b> อาณาจักร
+              <div>เป็นราชาหนูของอาณาจักร โดยมีหน้าที่ไม่ต่างจากทหารหนูตัวอื่น ๆ ในอาณาจักรมากนัก</div>
+              <span>แต่ด้วยความเป็นราชาหนูจึงมีภาระอันยิ่งใหญ่ ถ้าหากอยู่ในสถานะ</span> <span
+                class="text-red-500">'ตาย'</span>
+              อาณาจักร
               พื้นที่ และชัยชนะจะถูกช่วงชิง
-              และ อาณาจักรของคุณ<b class="text-red-500"> แพ้เกมในทันที </b>
+              และอาณาจักรของคุณจะ<b class="text-red-500"> แพ้เกมในทันที </b>
             </div>
 
             <div class="flex gap-2 my-4">
@@ -420,16 +427,20 @@ const toggleManaulModal = () => {
             </div>
             <div class="flex my-4 space-x-10">
               <div class="text-center">
-                <img src="/soldier-black.png" alt="soldier-black" class="w-28 rounded-lg border-orange-400 border-4">
+                <div class="rounded-lg border-orange-400 border-4">
+                  <img src="/black-soldier.png" alt="black-soldier" class="w-28 scale-[1.65]">
+                </div>
                 <b class="text-white bg-gray-900 rounded-lg p-2 border-orange-400 border-2">White soldier</b>
               </div>
               <div class="text-center">
-                <img src="/soldier-white.png" alt="soldier-white" class="w-28 rounded-lg border-orange-400 border-4">
+                <div class="rounded-lg border-orange-400 border-4">
+                  <img src="/white-soldier.png" alt="white-soldier" class="w-28 scale-[1.65]">
+                </div>
                 <b class="text-gray-900 bg-white rounded-lg p-2 border-orange-400 border-2">Black soldier</b>
               </div>
             </div>
             <div class="bg-white w-full border rounded-lg p-3">เป็นทหารหนูของอาณาจักร
-              โดยมีหน้าที่ช่วยกันปกป้องราชาหนูหนูจากอันตราย
+              โดยมีหน้าที่ช่วยกันปกป้องราชาหนูจากอันตราย
               และสามารถ <b class="text-red-500">ฆ่าราชาหนูของอาณาจักรฝั่งตรงข้าม</b> เพื่อคว้าชัยชนะได้
             </div>
           </div>
@@ -643,7 +654,8 @@ const toggleManaulModal = () => {
   </transition>
 
   <!-- Story Modal -->
-  <div v-if="storyModal" class="fixed inset-0 z-50 grid place-items-center  bg-black bg-opacity-50 backdrop-blur-lg w-screen h-screen">
+  <div v-if="storyModal"
+    class="fixed inset-0 z-50 grid place-items-center  bg-black bg-opacity-50 backdrop-blur-lg w-screen h-screen">
 
     <div
       class="bg-amber-100 border-[0.8rem] border-amber-500 p-5 rounded-lg w-6/12  h-3/5 md:h-4/5 grid grid-cols justify-center overflow-x-auto font-sigmar ">
@@ -657,17 +669,18 @@ const toggleManaulModal = () => {
       <div class="text-center mx-4 font-serif font-medium">
         <span class="text-lg text-gray-600 text-wrap font-mitr">สมบัติ เกียรติยศ และชีส
           สามสิ่งนี้เป็นสิ่งที่ประชาหนูทุกตัวแห่งอาณาจักรชีส
-          ต่างปรารถนา...
-          แต่น้ำนิ่งนั้นไหลลึก ภายใต้สันติสุขจอมปลอม ราชาขาว และ ราชาดำ
-          ทั้งสองได้ริเริ่มสงครามขึ้น
-          จะขาวหรือดำ จะชีสหรือเนย
-          มีเพียงผู้ชนะเท่านั้นที่จะได้เขียนประวัติศาสตร์ มาเถอะเหล่าผู้กล้าจงควบคุมพวกเราและคว้าชีสก้อนนั้นซะ!!!
+          <div>ต่างปรารถนา...</div>
+          <div class="text-red-600">แต่น้ำนิ่งนั้นไหลลึก.. ภายใต้สันติสุขจอมปลอม</div>
+          <span>ราชาขาว และ ราชาดำ ทั้งสองได้ริเริ่มสงครามขึ้น</span>
+          <div>จะขาวหรือดำ จะชีสหรือเนย
+            มีเพียงผู้ชนะเท่านั้นที่จะได้เขียนประวัติศาสตร์</div>
+          <div>มาเถอะเหล่าผู้กล้า จงควบคุมพวกเราและคว้าชีสก้อนนั้นซะ !!!</div>
         </span>
       </div>
 
       <div class="flex flex-row ml-96 md:ml-[80%]">
         <button @click="storyModal = false"
-          class="flex justify-end rounded-md mt-2 text-lg  text-amber-600 shadow-sm hover:text-amber-500 hover:scale-110 transition duration-300 ease-in-out">Skip
+          class="flex rounded-md mt-2 text-lg text-amber-600 hover:text-amber-500 hover:scale-110 transition duration-300 ease-in-out">Skip
           >></button>
       </div>
 
@@ -684,12 +697,12 @@ const toggleManaulModal = () => {
 
         <!-- ปุ่ม Game -->
         <div class="flex flex-col items-center gap-3 mt-6 md:mt-8">
-          <button @click="startGame"
-            class="bg-white rounded-lg text-lg md:text-xl lg:text-2xl shadow-md h-12 md:h-16 w-40 md:w-48 lg:w-56 text-green-600">
+          <button @click="startGame" translate="yes"
+            class="bg-white rounded-lg text-lg md:text-xl lg:text-2xl shadow-md h-12 md:h-16 w-40 md:w-48 lg:w-56 text-green-600 hover:scale-110 transition duration-300 ease-in-out">
             PLAY GAME
           </button>
           <button @click="manualModalOpenState = true"
-            class="bg-white rounded-lg text-lg md:text-xl lg:text-2xl shadow-md h-12 md:h-16 w-40 md:w-48 lg:w-56 text-slate-500">
+            class="bg-white rounded-lg text-lg md:text-xl lg:text-2xl shadow-md h-12 md:h-16 w-40 md:w-48 lg:w-56 text-slate-500 hover:scale-110 transition duration-300 ease-in-out">
             HOW TO PLAY
           </button>
         </div>
@@ -755,7 +768,7 @@ const toggleManaulModal = () => {
 
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display right -->
-      <div class="col-start-1">
+      <div class="col-start-1 select-none">
         <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
           :class="currentPlayerFaction === 'white' ? 'animate-glowing' : 'normal'">
           <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
@@ -792,43 +805,34 @@ const toggleManaulModal = () => {
               card.isReveal && card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               card.isReveal && card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
               card.isReveal && card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : '',
-             
+
               selectedMouse?.availableMoves.includes(card.id) && selectedMouse.validateMove(card) ? 'highlight-card' : ''
             ]">
 
             <div :class="{
               'opacity-0': !card.mouse,
               'opacity-100': card.mouse,
-              'ck-stucked': card.mouse?.isStucked,
+              'ck-stuck': card.mouse?.isStuck,
               'border-red-500 border-4 box-content opacity-60': card.mouse?.isDisabled,
               'border-green-500 border-4 box-content': card.mouse === selectedMouse,
               'scale-110': card.mouse === selectedMouse,
               'scale-90 opacity-50': selectedMouse && card.mouse?.faction === selectedMouse?.faction && card.mouse !== selectedMouse,
-            }" class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
-              <img
-                v-if="card.mouse?.type === 'king'"
-                :src="{
-                  'black': '/king-black.png',
-                  'white': '/king-white.png',
-                }[card.mouse?.faction]"
-                alt="King Mouse"
-                class="scale-[1.6]"
-              >
-              <img
-                v-if="card.mouse?.type === 'soldier'"
-                :src="{
-                  'black': '/black-soldier.png',
-                  'white': '/white-soldier.png',
-                }[card.mouse?.faction]"
-                alt="Soldier Mouse"
-                class="scale-[1]"
-              >
+            }"
+              class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500 select-none">
+              <img v-if="card.mouse?.type === 'king'" :src="{
+                'black': '/king-black.png',
+                'white': '/king-white.png',
+              }[card.mouse?.faction]" alt="King Mouse" class="scale-[1.65]">
+              <img v-if="card.mouse?.type === 'soldier'" :src="{
+                'black': '/black-soldier.png',
+                'white': '/white-soldier.png',
+              }[card.mouse?.faction]" alt="Soldier Mouse" class="scale-[1.65]">
             </div>
           </div>
         </div>
       </div>
       <!-- UI mouse display left -->
-      <div class="col-start-4">
+      <div class="col-start-4 select-none">
         <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
           :class="currentPlayerFaction === 'black' ? 'animate-glowing' : 'normal'">
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
@@ -859,7 +863,7 @@ const toggleManaulModal = () => {
   transition: transform 300ms ease, border 100ms ease;
 }
 
-.ck-mouse.ck-stucked {
+.ck-mouse.ck-stuck {
   transform: rotate(180deg);
   box-sizing: content-box;
   border: 8px solid #ceb723;
@@ -890,9 +894,12 @@ const toggleManaulModal = () => {
 }
 
 @keyframes zoom {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(.9);
   }
+
   50% {
     transform: scale(1);
   }
