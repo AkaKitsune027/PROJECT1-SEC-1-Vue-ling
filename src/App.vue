@@ -407,19 +407,19 @@ const toggleManaulModal = () => {
   </transition>
 
   <!-- Story Modal -->
-  <div v-if="storyModal" class="fixed inset-0 z-50 grid place-items-center  bg-black bg-opacity-50 ">
+  <div v-if="storyModal" class="fixed inset-0 z-50 grid place-items-center  bg-black bg-opacity-50 backdrop-blur-lg w-screen h-screen">
 
     <div
       class="bg-amber-100 border-[0.8rem] border-amber-500 p-5 rounded-lg w-6/12  h-3/5 md:h-4/5 grid grid-cols justify-center overflow-x-auto font-sigmar ">
 
       <div class="flex flex-col items-center justify-center">
         <h2 class="text-3xl font-bold text-[#65493e] animate-bounce"> Game Story</h2>
-        <img src="/game-story.png" alt="game-story"
-          class="rounded-lg w-56 h-36 bg-cover border border-white my-6 mx-4" />
+        <img src="/gameStory.png" alt="game-story"
+          class="rounded-lg w-60 h-40 bg-cover border border-white my-4 mx-4" />
       </div>
 
       <div class="text-center mx-4 font-serif font-medium">
-        <span class="text-lg text-gray-600 text-wrap">สมบัติ เกียรติยศ และชีส
+        <span class="text-lg text-gray-600 text-wrap font-mitr">สมบัติ เกียรติยศ และชีส
           สามสิ่งนี้เป็นสิ่งที่ประชาหนูทุกตัวแห่งอาณาจักรชีส
           ต่างปรารถนา...
           แต่น้ำนิ่งนั้นไหลลึก ภายใต้สันติสุขจอมปลอม ราชาขาว และ ราชาดำ
@@ -431,7 +431,7 @@ const toggleManaulModal = () => {
 
       <div class="flex flex-row ml-96 md:ml-[80%]">
         <button @click="storyModal = false"
-          class="flex justify-end rounded-md mt-2 text-lg  text-gray-600 shadow-sm hover:text-[#34a169] hover:scale-110 transition duration-300 ease-in-out">Skip
+          class="flex justify-end rounded-md mt-2 text-lg  text-amber-600 shadow-sm hover:text-amber-500 hover:scale-110 transition duration-300 ease-in-out">Skip
           >></button>
       </div>
 
