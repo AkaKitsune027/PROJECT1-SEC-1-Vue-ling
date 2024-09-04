@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         sigmar: ['"Sigmar one"', ...fontFamily.sans],
+        mitr: ['"Mitr"', ...fontFamily.sans],
       },
     },
   },

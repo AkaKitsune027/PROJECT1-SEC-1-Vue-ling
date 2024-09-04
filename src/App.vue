@@ -4,7 +4,6 @@ import { ref, computed, onMounted, watch } from 'vue'
 
 import Mouse from './classes/Mouse.js'
 import Card from './classes/Card.js'
-
 //sounds
 const bgmAudioSource = new Audio()
 bgmAudioSource.volume = 0.15
@@ -72,11 +71,12 @@ const winnerModalOpenState = ref(false)
 const manualModalOpenState = ref(false)
 const noplateToUseCheeseModal = ref(false)
 const useSameCheeseModal = ref(false)
+const storyModal = ref(false)
 const winnerMessage = ref('') // New ref for winner message
 
 const highlightedCells = ref([])
 
-const playerStuckedMouse = ref({
+const playerStuckMouse = ref({
   'white': null,
   'black': null
 })
@@ -136,6 +136,19 @@ const totalWhiteMouses = computed(() => {
   return cards.value.flat().filter((c) => c.mouse?.faction === 'white' && c.mouse.type === 'soldier').length
 })
 
+function getCurrentPlayerMouses() {
+  const result = []
+
+  for (const c of cards.value.flat()) {
+    if (c.mouse && c.mouse.faction === currentPlayerFaction.value) {
+      result.push(c.mouse)
+    }
+    continue
+  }
+
+  return result
+}
+
 /**
  * Total black mouses
  */
@@ -167,16 +180,21 @@ const triggerCardEvent = (card) => {
     }
 
   } else if (card.type === 'peanut') {
+    const isHaveSoldier = cards.value.flat().some((c) => c.mouse?.type === 'soldier' && c.mouse?.faction === currentPlayerFaction.value)
+
+    if (!isHaveSoldier) return
+    console.log(isHaveSoldier)
+
     selectedMouse.value.isDisabled = true
 
   } else if (card.type === 'glue') {
-    selectedMouse.value.isStucked = true
-    playerStuckedMouse.value[currentPlayerFaction.value] = selectedMouse.value
+    selectedMouse.value.isStuck = true
+    playerStuckMouse.value[currentPlayerFaction.value] = selectedMouse.value
 
     const opponentFaction = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 
-    if (playerStuckedMouse.value[opponentFaction] && playerStuckedMouse.value[opponentFaction].card.id === card.id) {
-      playerStuckedMouse.value[opponentFaction] = null
+    if (playerStuckMouse.value[opponentFaction] && playerStuckMouse.value[opponentFaction].card.id === card.id) {
+      playerStuckMouse.value[opponentFaction] = null
     }
 
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
@@ -209,17 +227,18 @@ const triggerCardEvent = (card) => {
  * Switch turn between white and black
  */
 function switchTurn() {
-  if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
+  const currentPlayerMouses = getCurrentPlayerMouses()
+  if (currentPlayerMouses.some((m => m.isDisabled)) || (currentPlayerMouses.length === 1 && currentPlayerMouses[0].card.type === 'spring')) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 
-  if (playerStuckedMouse.value[currentPlayerFaction.value]) {
+  if (playerStuckMouse.value[currentPlayerFaction.value]) {
     playerStuckModal.value[currentPlayerFaction.value] = true
   }
 }
 
 const handleStuckModalSubmit = () => {
-  playerStuckedMouse.value[currentPlayerFaction.value].isStucked = false
-  playerStuckedMouse.value[currentPlayerFaction.value] = null
+  playerStuckMouse.value[currentPlayerFaction.value].isStuck = false
+  playerStuckMouse.value[currentPlayerFaction.value] = null
   playerStuckModal.value[currentPlayerFaction.value] = false
   switchTurn()
 }
@@ -238,19 +257,9 @@ const handleSelectCard = async (selectedCard) => {
   } else if (selectedMouse.value) { // If a mouse is selected, move it to the selected card.
     if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
 
-      const currentPlayerMouses = []
-
-      for (const c of cards.value.flat()) {
-        if (c.mouse && c.mouse.faction === currentPlayerFaction.value) {
-          currentPlayerMouses.push(c.mouse)
-        }
-        continue
-      }
-
-      for (const m of currentPlayerMouses) {
+      for (const m of getCurrentPlayerMouses()) {
         m.isDisabled = false
       }
-
 
       triggerCardEvent(selectedCard)
       switchTurn()
@@ -264,6 +273,7 @@ const handleSelectCard = async (selectedCard) => {
  * Start the game
  */
 const startGame = () => {
+  storyModal.value = true
   setupBoard()
   currentPlayerFaction.value = Math.random() < 0.5 ? 'white' : 'black'
   currentPage.value = 'game' // Switch to game page
@@ -289,6 +299,8 @@ function showWinnerModal(message) {
 
 
 }
+
+
 
 // Function to check game over conditions
 function checkGameOver() {
@@ -630,6 +642,38 @@ const toggleManaulModal = () => {
     </div>
   </transition>
 
+  <!-- Story Modal -->
+  <div v-if="storyModal" class="fixed inset-0 z-50 grid place-items-center  bg-black bg-opacity-50 backdrop-blur-lg w-screen h-screen">
+
+    <div
+      class="bg-amber-100 border-[0.8rem] border-amber-500 p-5 rounded-lg w-6/12  h-3/5 md:h-4/5 grid grid-cols justify-center overflow-x-auto font-sigmar ">
+
+      <div class="flex flex-col items-center justify-center">
+        <h2 class="text-3xl font-bold text-[#65493e] animate-bounce"> Game Story</h2>
+        <img src="/gameStory.png" alt="game-story"
+          class="rounded-lg w-60 h-40 bg-cover border border-white my-4 mx-4" />
+      </div>
+
+      <div class="text-center mx-4 font-serif font-medium">
+        <span class="text-lg text-gray-600 text-wrap font-mitr">สมบัติ เกียรติยศ และชีส
+          สามสิ่งนี้เป็นสิ่งที่ประชาหนูทุกตัวแห่งอาณาจักรชีส
+          ต่างปรารถนา...
+          แต่น้ำนิ่งนั้นไหลลึก ภายใต้สันติสุขจอมปลอม ราชาขาว และ ราชาดำ
+          ทั้งสองได้ริเริ่มสงครามขึ้น
+          จะขาวหรือดำ จะชีสหรือเนย
+          มีเพียงผู้ชนะเท่านั้นที่จะได้เขียนประวัติศาสตร์ มาเถอะเหล่าผู้กล้าจงควบคุมพวกเราและคว้าชีสก้อนนั้นซะ!!!
+        </span>
+      </div>
+
+      <div class="flex flex-row ml-96 md:ml-[80%]">
+        <button @click="storyModal = false"
+          class="flex justify-end rounded-md mt-2 text-lg  text-amber-600 shadow-sm hover:text-amber-500 hover:scale-110 transition duration-300 ease-in-out">Skip
+          >></button>
+      </div>
+
+    </div>
+  </div>
+
   <div v-if="currentPage === 'home'">
     <div class="w-screen h-screen bg-[url('/bg-main-menu.png')] bg-no-repeat bg-cover bg-center">
       <div class="grid grid-rows-2 grid-flow-col gap-4 font-sigmar">
@@ -653,6 +697,8 @@ const toggleManaulModal = () => {
     </div>
   </div>
   <div v-else-if="currentPage === 'game'">
+
+
     <div class="-z-10 fixed w-screen h-screen bg-[#0002] backdrop-blur-sm"></div>
     <div class="-z-20 fixed bg-[url('/bg2.png')] bg-cover w-screen h-screen"></div>
     <!-- button menu -->
@@ -710,8 +756,7 @@ const toggleManaulModal = () => {
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display right -->
       <div class="col-start-1">
-        <div
-          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
           :class="currentPlayerFaction === 'white' ? 'animate-glowing' : 'normal'">
           <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
 
@@ -722,9 +767,12 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalWhiteMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['swiss-cheese'] }">
-                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['cheddar-cheese'] }">
-                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['gouda-cheese'] }">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['swiss-cheese'] }">
+                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -747,6 +795,7 @@ const toggleManaulModal = () => {
              
               selectedMouse?.availableMoves.includes(card.id) && selectedMouse.validateMove(card) ? 'highlight-card' : ''
             ]">
+
             <div :class="{
               'opacity-0': !card.mouse,
               'opacity-100': card.mouse,
@@ -780,8 +829,7 @@ const toggleManaulModal = () => {
       </div>
       <!-- UI mouse display left -->
       <div class="col-start-4">
-        <div 
-          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
           :class="currentPlayerFaction === 'black' ? 'animate-glowing' : 'normal'">
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
@@ -791,9 +839,12 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalBlackMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['swiss-cheese'] }">
-                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['cheddar-cheese'] }">
-                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['gouda-cheese'] }">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['swiss-cheese'] }">
+                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -857,7 +908,9 @@ const toggleManaulModal = () => {
 @keyframes glow {
   from {
     box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.25);
-  } to {
+  }
+
+  to {
     box-shadow: 0 0 35px 10px rgba(255, 255, 255, 0.75);
   }
 }

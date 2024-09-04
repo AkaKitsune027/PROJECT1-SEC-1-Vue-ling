@@ -14,7 +14,7 @@ export default class Mouse {
     this.faction = faction
     this.type = type
     this.isDisabled = false
-    this.isStucked = false
+    this.isStuck = false
     this.disableCards = []
 
     this._card = null
@@ -98,7 +98,7 @@ export default class Mouse {
       return false
     }
 
-    if (this.isStucked) {
+    if (this.isStuck) {
       return false
     }
 
