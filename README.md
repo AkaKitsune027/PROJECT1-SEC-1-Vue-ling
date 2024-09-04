@@ -7,10 +7,10 @@
 | Student ID | Name | Contribution | Contribution Rate |
 | ---- | ---- | ---- | ---- |
 | 65130500068 | Ratikorn   Damgurnglubpanavanit |
-| 65130500070 | Wanassanan Tri-apibanwongsa |
-| 65130500071 | Woranuch   Naritnet |
-| 65130500111 | Pimpajee   Seththirungplop |
-| 65130500125 | Achmvee    Sanuwong |
+| 65130500070 | Wanassanan Tri-apibanwongsa     |
+| 65130500071 | Woranuch   Naritnet             |
+| 65130500111 | Pimpajee   Seththirungplop      |
+| 65130500125 | Achmvee    Sanuwong             |
 
 ## Feature
 ![image](https://github.com/user-attachments/assets/666c4199-3fd1-4e3c-bf80-3472f9b82ed8)
@@ -19,7 +19,7 @@
 ![image](https://github.com/user-attachments/assets/98599469-e647-4731-8031-cf07f78b7dfb)
 
 ## References
-- Generative Ai
+- Generative AI
   - ChatGPT
   - Claude
   - Recraft
