@@ -744,16 +744,7 @@ const toggleManaulModal = () => {
               card.isReveal && card.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
               card.isReveal && card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               card.isReveal && card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
-              card.isReveal && card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : '',
-
-              card.type === 'plate' ? 'bg-[url(/plate.png)]' : 'bg-stone-600',
-              card.type === 'spring' ? 'bg-[url(/spring.png)]' : '',
-              card.type === 'peanut' ? 'bg-[url(/peanut.png)]' : '',
-              card.type === 'cheddar-cheese' ? 'bg-[url(/cheddar-cheese.png)]' : '',
-              card.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
-              card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
-              card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
-              card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : ''
+              card.isReveal && card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : ''
             ]">
             <div v-if="card.mouse" :class="{
               'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
