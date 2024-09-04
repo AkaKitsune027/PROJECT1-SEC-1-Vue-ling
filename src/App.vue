@@ -104,14 +104,14 @@ function setupBoard() {
  * Total white mouses
  */
 const totalWhiteMouses = computed(() => {
-  return cards.value.flat().filter((c) => c.mouse?.faction === 'white').length
+  return cards.value.flat().filter((c) => c.mouse?.faction === 'white' && c.mouse.type === 'soldier').length
 })
 
 /**
  * Total black mouses
  */
 const totalBlackMouses = computed(() => {
-  return cards.value.flat().filter((c) => c.mouse?.faction === 'black').length
+  return cards.value.flat().filter((c) => c.mouse?.faction === 'black' && c.mouse.type === 'soldier').length
 })
 
 /**
@@ -484,7 +484,7 @@ const toggleManaulModal = () => {
               'bg-[url(/soldier-black.png)]': card.mouse?.faction === 'black' && card.mouse?.type === 'soldier',
               'bg-[url(/soldier-white.png)]': card.mouse?.faction === 'white' && card.mouse?.type === 'soldier',
               'ck-stucked': card.mouse?.isStucked,
-              'border-red-500 border-4 box-content': card.mouse?.isDisabled,
+              'border-red-500 border-4 box-content opacity-60': card.mouse?.isDisabled,
               'border-green-500 border-4 box-content': card.mouse === selectedMouse,
               'scale-110': card.mouse === selectedMouse,
               'scale-90 opacity-50': selectedMouse && card.mouse?.faction === selectedMouse?.faction && card.mouse !== selectedMouse,
