@@ -413,13 +413,13 @@ const toggleManaulModal = () => {
       class="bg-amber-100 border-[0.8rem] border-amber-500 p-5 rounded-lg w-6/12  h-3/5 md:h-4/5 grid grid-cols justify-center overflow-x-auto font-sigmar ">
 
       <div class="flex flex-col items-center justify-center">
-        <h2 class="text-2xl font-bold text-[#65493e] animate-bounce"> Game Story</h2>
+        <h2 class="text-3xl font-bold text-[#65493e] animate-bounce"> Game Story</h2>
         <img src="/game-story.png" alt="game-story"
-          class="rounded-lg w-52 h-32 bg-cover border border-white my-6 mx-4" />
+          class="rounded-lg w-56 h-36 bg-cover border border-white my-6 mx-4" />
       </div>
 
       <div class="text-center mx-4 font-serif font-medium">
-        <span class="text-lg text-gray-600 ">สมบัติ เกียรติยศ และชีส
+        <span class="text-lg text-gray-600 text-wrap">สมบัติ เกียรติยศ และชีส
           สามสิ่งนี้เป็นสิ่งที่ประชาหนูทุกตัวแห่งอาณาจักรชีส
           ต่างปรารถนา...
           แต่น้ำนิ่งนั้นไหลลึก ภายใต้สันติสุขจอมปลอม ราชาขาว และ ราชาดำ
