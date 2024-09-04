@@ -72,11 +72,12 @@ const winnerModalOpenState = ref(false)
 const manualModalOpenState = ref(false)
 const noplateToUseCheeseModal = ref(false)
 const useSameCheeseModal = ref(false)
+const storyModal = ref(false)
 const winnerMessage = ref('') // New ref for winner message
 
 const highlightedCells = ref([])
 
-const playerStuckedMouse = ref({
+const playerStuckMouse = ref({
   'white': null,
   'black': null
 })
@@ -170,13 +171,13 @@ const triggerCardEvent = (card) => {
     selectedMouse.value.isDisabled = true
 
   } else if (card.type === 'glue') {
-    selectedMouse.value.isStucked = true
-    playerStuckedMouse.value[currentPlayerFaction.value] = selectedMouse.value
+    selectedMouse.value.isStuck = true
+    playerStuckMouse.value[currentPlayerFaction.value] = selectedMouse.value
 
     const opponentFaction = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 
-    if (playerStuckedMouse.value[opponentFaction] && playerStuckedMouse.value[opponentFaction].card.id === card.id) {
-      playerStuckedMouse.value[opponentFaction] = null
+    if (playerStuckMouse.value[opponentFaction] && playerStuckMouse.value[opponentFaction].card.id === card.id) {
+      playerStuckMouse.value[opponentFaction] = null
     }
 
   } else if (['cheddar-cheese', 'gouda-cheese', 'swiss-cheese'].includes(card.type) && selectedMouse.value.type === 'king') {
@@ -212,14 +213,14 @@ function switchTurn() {
   if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 
-  if (playerStuckedMouse.value[currentPlayerFaction.value]) {
+  if (playerStuckMouse.value[currentPlayerFaction.value]) {
     playerStuckModal.value[currentPlayerFaction.value] = true
   }
 }
 
 const handleStuckModalSubmit = () => {
-  playerStuckedMouse.value[currentPlayerFaction.value].isStucked = false
-  playerStuckedMouse.value[currentPlayerFaction.value] = null
+  playerStuckMouse.value[currentPlayerFaction.value].isStuck = false
+  playerStuckMouse.value[currentPlayerFaction.value] = null
   playerStuckModal.value[currentPlayerFaction.value] = false
   switchTurn()
 }
@@ -264,6 +265,7 @@ const handleSelectCard = async (selectedCard) => {
  * Start the game
  */
 const startGame = () => {
+  storyModal.value = true
   setupBoard()
   currentPlayerFaction.value = Math.random() < 0.5 ? 'white' : 'black'
   currentPage.value = 'game' // Switch to game page
@@ -289,6 +291,8 @@ function showWinnerModal(message) {
 
 
 }
+
+
 
 // Function to check game over conditions
 function checkGameOver() {
@@ -626,6 +630,38 @@ const toggleManaulModal = () => {
     </div>
   </transition>
 
+  <!-- Story Modal -->
+  <div v-if="storyModal" class="fixed inset-0 z-50 grid place-items-center  bg-black bg-opacity-50 backdrop-blur-lg w-screen h-screen">
+
+    <div
+      class="bg-amber-100 border-[0.8rem] border-amber-500 p-5 rounded-lg w-6/12  h-3/5 md:h-4/5 grid grid-cols justify-center overflow-x-auto font-sigmar ">
+
+      <div class="flex flex-col items-center justify-center">
+        <h2 class="text-3xl font-bold text-[#65493e] animate-bounce"> Game Story</h2>
+        <img src="/gameStory.png" alt="game-story"
+          class="rounded-lg w-60 h-40 bg-cover border border-white my-4 mx-4" />
+      </div>
+
+      <div class="text-center mx-4 font-serif font-medium">
+        <span class="text-lg text-gray-600 text-wrap font-mitr">สมบัติ เกียรติยศ และชีส
+          สามสิ่งนี้เป็นสิ่งที่ประชาหนูทุกตัวแห่งอาณาจักรชีส
+          ต่างปรารถนา...
+          แต่น้ำนิ่งนั้นไหลลึก ภายใต้สันติสุขจอมปลอม ราชาขาว และ ราชาดำ
+          ทั้งสองได้ริเริ่มสงครามขึ้น
+          จะขาวหรือดำ จะชีสหรือเนย
+          มีเพียงผู้ชนะเท่านั้นที่จะได้เขียนประวัติศาสตร์ มาเถอะเหล่าผู้กล้าจงควบคุมพวกเราและคว้าชีสก้อนนั้นซะ!!!
+        </span>
+      </div>
+
+      <div class="flex flex-row ml-96 md:ml-[80%]">
+        <button @click="storyModal = false"
+          class="flex justify-end rounded-md mt-2 text-lg  text-amber-600 shadow-sm hover:text-amber-500 hover:scale-110 transition duration-300 ease-in-out">Skip
+          >></button>
+      </div>
+
+    </div>
+  </div>
+
   <div v-if="currentPage === 'home'">
     <div class="w-screen h-screen bg-[url('/bg-main-menu.png')] bg-no-repeat bg-cover bg-center">
       <div class="grid grid-rows-2 grid-flow-col gap-4 font-sigmar">
@@ -649,6 +685,8 @@ const toggleManaulModal = () => {
     </div>
   </div>
   <div v-else-if="currentPage === 'game'">
+
+
     <div class="-z-10 fixed w-screen h-screen bg-[#0002] backdrop-blur-sm"></div>
     <div class="-z-20 fixed bg-[url('/bg2.png')] bg-cover w-screen h-screen"></div>
     <!-- button menu -->
@@ -743,6 +781,7 @@ const toggleManaulModal = () => {
              
               selectedMouse?.availableMoves.includes(card.id) && selectedMouse.validateMove(card) ? 'highlight-card' : ''
             ]">
+
             <div :class="{
               'opacity-0': !card.mouse,
               'opacity-100': card.mouse,
