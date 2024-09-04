@@ -132,6 +132,19 @@ const totalWhiteMouses = computed(() => {
   return cards.value.flat().filter((c) => c.mouse?.faction === 'white').length
 })
 
+function getCurrentPlayerMouses() {
+  const result = []
+
+  for (const c of cards.value.flat()) {
+    if (c.mouse && c.mouse.faction === currentPlayerFaction.value) {
+      result.push(c.mouse)
+    }
+    continue
+  }
+
+  return result
+}
+
 /**
  * Total black mouses
  */
@@ -210,7 +223,8 @@ const triggerCardEvent = (card) => {
  * Switch turn between white and black
  */
 function switchTurn() {
-  if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
+  const currentPlayerMouses = getCurrentPlayerMouses()
+  if (currentPlayerMouses.some((m => m.isDisabled)) || (currentPlayerMouses.length === 1 && currentPlayerMouses[0].card.type === 'spring')) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 
   if (playerStuckedMouse.value[currentPlayerFaction.value]) {
@@ -238,16 +252,7 @@ const handleSelectCard = async (selectedCard) => {
   } else if (selectedMouse.value !== null) { // If a mouse is selected, move it to the selected card.
     if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
 
-      const currentPlayerMouses = []
-
-      for (const c of cards.value.flat()) {
-        if (c.mouse && c.mouse.faction === currentPlayerFaction.value) {
-          currentPlayerMouses.push(c.mouse)
-        }
-        continue
-      }
-
-      for (const m of currentPlayerMouses) {
+      for (const m of getCurrentPlayerMouses()) {
         m.isDisabled = false
       }
 
