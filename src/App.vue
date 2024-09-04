@@ -750,8 +750,6 @@ const toggleManaulModal = () => {
             <div :class="{
               'opacity-0': !card.mouse,
               'opacity-100': card.mouse,
-              // 'bg-[url(/black-soldier.png)]': card.mouse?.faction === 'black' && card.mouse?.type === 'soldier',
-              // 'bg-[url(/white-soldier.png)]': card.mouse?.faction === 'white' && card.mouse?.type === 'soldier',
               'ck-stucked': card.mouse?.isStucked,
               'border-red-500 border-4 box-content opacity-60': card.mouse?.isDisabled,
               'border-green-500 border-4 box-content': card.mouse === selectedMouse,
