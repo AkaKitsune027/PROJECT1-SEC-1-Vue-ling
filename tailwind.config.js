@@ -1,19 +1,16 @@
-import daisyui from 'daisyui'
-import typography from '@tailwindcss/typography'
-const { fontFamily } = require('tailwindcss/defaultTheme')
+import daisyui from "daisyui"
+const { fontFamily } = require("tailwindcss/defaultTheme")
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
     extend: {
       fontFamily: {
         sigmar: ['"Sigmar one"', ...fontFamily.sans],
         mitr: ['"Mitr"', ...fontFamily.sans],
-
-      }
-            
-    }
+      },
+    },
   },
-  plugins: [daisyui, typography]
+  plugins: [daisyui],
 }
