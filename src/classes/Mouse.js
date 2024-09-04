@@ -65,7 +65,6 @@ export default class Mouse {
         if (this.card.id % boardSize !== 0 && this.card.id + boardSize < boardSize * boardSize) moves.push(this.card.id + boardSize - 1)
         if (this.card.id % boardSize !== boardSize - 1 && this.card.id + boardSize < boardSize * boardSize) moves.push(this.card.id + boardSize + 1)
 
-        // console.log(moves)
         return moves
     }
 

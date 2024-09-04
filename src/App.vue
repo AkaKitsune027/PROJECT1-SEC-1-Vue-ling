@@ -4,7 +4,6 @@ import { ref, computed, onMounted, watch } from 'vue'
 
 import Mouse from './classes/Mouse.js'
 import Card from './classes/Card.js'
-
 //sounds
 const bgmAudioSource = new Audio()
 bgmAudioSource.volume = 0.15
@@ -164,6 +163,11 @@ const triggerCardEvent = (card) => {
     }
 
   } else if (card.type === 'peanut') {
+    const isHaveSoldier = cards.value.flat().some((c) => c.mouse?.type === 'soldier' && c.mouse?.faction === currentPlayerFaction.value)
+
+    if (!isHaveSoldier) return
+    console.log(isHaveSoldier)
+
     selectedMouse.value.isDisabled = true
 
   } else if (card.type === 'glue') {
@@ -246,7 +250,6 @@ const handleSelectCard = async (selectedCard) => {
       for (const m of currentPlayerMouses) {
         m.isDisabled = false
       }
-
 
       triggerCardEvent(selectedCard)
       switchTurn()
@@ -701,8 +704,7 @@ const toggleManaulModal = () => {
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display right -->
       <div class="col-start-1">
-        <div
-          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
           :class="currentPlayerFaction === 'white' ? 'animate-glowing' : 'normal'">
           <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
 
@@ -713,9 +715,12 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalWhiteMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['swiss-cheese'] }">
-                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['cheddar-cheese'] }">
-                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['gouda-cheese'] }">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['swiss-cheese'] }">
+                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -734,7 +739,16 @@ const toggleManaulModal = () => {
               card.isReveal && card.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
               card.isReveal && card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
               card.isReveal && card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
-              card.isReveal && card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : ''
+              card.isReveal && card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : '',
+
+              card.type === 'plate' ? 'bg-[url(/plate.png)]' : 'bg-stone-600',
+              card.type === 'spring' ? 'bg-[url(/spring.png)]' : '',
+              card.type === 'peanut' ? 'bg-[url(/peanut.png)]' : '',
+              card.type === 'cheddar-cheese' ? 'bg-[url(/cheddar-cheese.png)]' : '',
+              card.type === 'gouda-cheese' ? 'bg-[url(/gouda-cheese.png)]' : '',
+              card.type === 'swiss-cheese' ? 'bg-[url(/swiss-cheese.png)]' : '',
+              card.type === 'glue' ? 'bg-[url(/glue-mouse-trap.png)]' : '',
+              card.type === 'cat' ? 'bg-[url(/cat-card.png)]' : ''
             ]">
             <div v-if="card.mouse" :class="{
               'bg-[url(/king-black.png)]': card.mouse.faction === 'black' && card.mouse.type === 'king',
@@ -750,8 +764,7 @@ const toggleManaulModal = () => {
       </div>
       <!-- UI mouse display left -->
       <div class="col-start-4">
-        <div 
-          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
           :class="currentPlayerFaction === 'black' ? 'animate-glowing' : 'normal'">
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
@@ -761,9 +774,12 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalBlackMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['swiss-cheese'] }">
-                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['cheddar-cheese'] }">
-                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['gouda-cheese'] }">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['swiss-cheese'] }">
+                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -794,7 +810,9 @@ const toggleManaulModal = () => {
 @keyframes glow {
   from {
     box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.25);
-  } to {
+  }
+
+  to {
     box-shadow: 0 0 35px 10px rgba(255, 255, 255, 0.75);
   }
 }
