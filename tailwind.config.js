@@ -8,8 +8,11 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sigmar: ['"Sigmar one"', ...fontFamily.sans]
+        sigmar: ['"Sigmar one"', ...fontFamily.sans],
+        mitr: ['"Mitr"', ...fontFamily.sans],
+
       }
+            
     }
   },
   plugins: [daisyui, typography]
