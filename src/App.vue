@@ -320,6 +320,10 @@ const handleBackToMenu = () => {
     }
   }
 
+  playerStuckModal.value = {
+    'white': false,
+    'black': false
+  }
   winnerModalOpenState.value = false
 }
 
@@ -746,16 +750,32 @@ const toggleManaulModal = () => {
             <div :class="{
               'opacity-0': !card.mouse,
               'opacity-100': card.mouse,
-              'bg-[url(/king-black.png)]': card.mouse?.faction === 'black' && card.mouse?.type === 'king',
-              'bg-[url(/king-white.png)]': card.mouse?.faction === 'white' && card.mouse?.type === 'king',
-              'bg-[url(/soldier-black.png)]': card.mouse?.faction === 'black' && card.mouse?.type === 'soldier',
-              'bg-[url(/soldier-white.png)]': card.mouse?.faction === 'white' && card.mouse?.type === 'soldier',
+              // 'bg-[url(/black-soldier.png)]': card.mouse?.faction === 'black' && card.mouse?.type === 'soldier',
+              // 'bg-[url(/white-soldier.png)]': card.mouse?.faction === 'white' && card.mouse?.type === 'soldier',
               'ck-stucked': card.mouse?.isStucked,
               'border-red-500 border-4 box-content opacity-60': card.mouse?.isDisabled,
               'border-green-500 border-4 box-content': card.mouse === selectedMouse,
               'scale-110': card.mouse === selectedMouse,
               'scale-90 opacity-50': selectedMouse && card.mouse?.faction === selectedMouse?.faction && card.mouse !== selectedMouse,
             }" class="ck-mouse w-12 h-12 rounded-full bg-cover border-2 border-black visited:border-green-500">
+              <img
+                v-if="card.mouse?.type === 'king'"
+                :src="{
+                  'black': '/king-black.png',
+                  'white': '/king-white.png',
+                }[card.mouse?.faction]"
+                alt="King Mouse"
+                class="scale-[1.6]"
+              >
+              <img
+                v-if="card.mouse?.type === 'soldier'"
+                :src="{
+                  'black': '/black-soldier.png',
+                  'white': '/white-soldier.png',
+                }[card.mouse?.faction]"
+                alt="Soldier Mouse"
+                class="scale-[1]"
+              >
             </div>
           </div>
         </div>
