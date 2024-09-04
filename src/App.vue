@@ -4,7 +4,6 @@ import { ref, computed, onMounted, watch } from 'vue'
 
 import Mouse from './classes/Mouse.js'
 import Card from './classes/Card.js'
-
 //sounds
 const bgmAudioSource = new Audio()
 bgmAudioSource.volume = 0.15
@@ -137,6 +136,19 @@ const totalWhiteMouses = computed(() => {
   return cards.value.flat().filter((c) => c.mouse?.faction === 'white' && c.mouse.type === 'soldier').length
 })
 
+function getCurrentPlayerMouses() {
+  const result = []
+
+  for (const c of cards.value.flat()) {
+    if (c.mouse && c.mouse.faction === currentPlayerFaction.value) {
+      result.push(c.mouse)
+    }
+    continue
+  }
+
+  return result
+}
+
 /**
  * Total black mouses
  */
@@ -168,6 +180,11 @@ const triggerCardEvent = (card) => {
     }
 
   } else if (card.type === 'peanut') {
+    const isHaveSoldier = cards.value.flat().some((c) => c.mouse?.type === 'soldier' && c.mouse?.faction === currentPlayerFaction.value)
+
+    if (!isHaveSoldier) return
+    console.log(isHaveSoldier)
+
     selectedMouse.value.isDisabled = true
 
   } else if (card.type === 'glue') {
@@ -210,7 +227,8 @@ const triggerCardEvent = (card) => {
  * Switch turn between white and black
  */
 function switchTurn() {
-  if (cards.value.flat().filter(c => c.mouse && c.mouse.faction === currentPlayerFaction.value).some((c => c.mouse.isDisabled))) return
+  const currentPlayerMouses = getCurrentPlayerMouses()
+  if (currentPlayerMouses.some((m => m.isDisabled)) || (currentPlayerMouses.length === 1 && currentPlayerMouses[0].card.type === 'spring')) return
   currentPlayerFaction.value = currentPlayerFaction.value === 'white' ? 'black' : 'white'
 
   if (playerStuckMouse.value[currentPlayerFaction.value]) {
@@ -239,19 +257,9 @@ const handleSelectCard = async (selectedCard) => {
   } else if (selectedMouse.value) { // If a mouse is selected, move it to the selected card.
     if (await selectedMouse.value.moveTo(selectedCard)) {  // If the move is successful, switch turn.
 
-      const currentPlayerMouses = []
-
-      for (const c of cards.value.flat()) {
-        if (c.mouse && c.mouse.faction === currentPlayerFaction.value) {
-          currentPlayerMouses.push(c.mouse)
-        }
-        continue
-      }
-
-      for (const m of currentPlayerMouses) {
+      for (const m of getCurrentPlayerMouses()) {
         m.isDisabled = false
       }
-
 
       triggerCardEvent(selectedCard)
       switchTurn()
@@ -744,8 +752,7 @@ const toggleManaulModal = () => {
     <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display right -->
       <div class="col-start-1">
-        <div
-          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
           :class="currentPlayerFaction === 'white' ? 'animate-glowing' : 'normal'">
           <img src="/grey_mouse.png" alt="greyMouse" class="rounded-lg w-56 h-56 my-3 border border-white"></img>
 
@@ -756,9 +763,12 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalWhiteMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['swiss-cheese'] }">
-                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['cheddar-cheese'] }">
-                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.white['gouda-cheese'] }">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['swiss-cheese'] }">
+                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="goudar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.white['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -801,8 +811,7 @@ const toggleManaulModal = () => {
       </div>
       <!-- UI mouse display left -->
       <div class="col-start-4">
-        <div 
-          class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
+        <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
           :class="currentPlayerFaction === 'black' ? 'animate-glowing' : 'normal'">
           <img src="/grey_kem_mouse.png" class="rounded-lg w-56 h-56 my-3 border border-white" alt="greyKemMouse"></img>
           <div class="flex bg-[#313638] w-60 h-48 rounded-xl items-center justify-center">
@@ -812,9 +821,12 @@ const toggleManaulModal = () => {
                 <span class="text-outline">x {{ totalBlackMouses }}</span>
               </div>
               <div class="flex justify-center gap-2">
-                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['swiss-cheese'] }">
-                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['cheddar-cheese'] }">
-                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl" :class="{ 'saturate-0': usedCheeses.black['gouda-cheese'] }">
+                <img src="/swiss-cheese.png" alt="swiss_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['swiss-cheese'] }">
+                <img src="/cheddar-cheese.png" alt="cheddar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['cheddar-cheese'] }">
+                <img src="/gouda-cheese.png" alt="gousar_cheese" class="w-16 h-16 rounded-xl"
+                  :class="{ 'saturate-0': usedCheeses.black['gouda-cheese'] }">
               </div>
             </div>
           </div>
@@ -878,7 +890,9 @@ const toggleManaulModal = () => {
 @keyframes glow {
   from {
     box-shadow: 0 0 35px 5px rgba(255, 255, 255, 0.25);
-  } to {
+  }
+
+  to {
     box-shadow: 0 0 35px 10px rgba(255, 255, 255, 0.75);
   }
 }
