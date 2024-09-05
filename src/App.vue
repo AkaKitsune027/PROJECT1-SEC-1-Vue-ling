@@ -378,10 +378,13 @@ const toggleManaulModal = () => {
                 w-[50%]">
             Goal / How you can win </p>
           <div class="m-4">
-            <div>คุณสามารถชนะได้ด้วยวิธีใดด้วยวิธีหนึ่งจากวิธีต่อไปนี้</div>
-            <span class="text-red-600">[รูป]กำจัดหนูทั้งหมดบนกระดาน</span>ของหนูอาณาจักรฝั่งตรงข้าม
-            <div class="text-red-600">[รูป]กำจัดราชาหนูอาณาจักรฝั่งตรงข้าม</div>
-            <span class="text-red-600">[รูป] ราชาหนูอาณาจักรตรงข้ามโดนแมวกิน </span>
+            <div>คุณสามารถชนะได้ด้วยวิธีใดด้วยวิธีหนึ่งจากวิธี ต่อไปนี้</div>
+            - <span class="text-red-600">กำจัดหนูทั้งหมดบนกระดาน</span>ของหนูฝั่งตรงข้าม
+            <img src="/kill-1.png" class="w-48 h-48 rounded-lg" />
+            - <span class="text-red-600"> กำจัดราชาหนูฝั่งตรงข้าม<img src="/kill-2.png" class="w-48 h-48 rounded-lg" />
+            </span>
+            - <span class="text-red-600">ราชาหนูตรงข้ามโดนแมวกิน <img src="/kill-3.png"
+                class="w-48 h-48 rounded-lg" /></span>
           </div>
 
           <div class="m-4">
@@ -411,12 +414,11 @@ const toggleManaulModal = () => {
               </div>
             </div>
             <div class="bg-white w-full border rounded-lg p-3">
-              <div>เป็นราชาหนูของอาณาจักร โดยมีหน้าที่ไม่ต่างจากทหารหนูตัวอื่น ๆ ในอาณาจักรมากนัก</div>
+              <div>เป็นราชาหนู โดยมีหน้าที่ไม่ต่างจากทหารหนูตัวอื่น ๆ มากนัก</div>
               <span>แต่ด้วยความเป็นราชาหนูจึงมีภาระอันยิ่งใหญ่ ถ้าหากอยู่ในสถานะ</span> <span
-                class="text-red-500">'ตาย'</span>
-              อาณาจักร
+                class="text-red-500">'ถูกกำจัด'</span>
               พื้นที่ และชัยชนะจะถูกช่วงชิง
-              และอาณาจักรของคุณจะ<b class="text-red-500"> แพ้เกมในทันที </b>
+              และคุณจะ<b class="text-red-500"> แพ้เกมในทันที </b>
             </div>
 
             <div class="flex gap-2 my-4">
@@ -439,9 +441,9 @@ const toggleManaulModal = () => {
                 <b class="text-gray-900 bg-white rounded-lg p-2 border-orange-400 border-2">Black soldier</b>
               </div>
             </div>
-            <div class="bg-white w-full border rounded-lg p-3">เป็นทหารหนูของอาณาจักร
+            <div class="bg-white w-full border rounded-lg p-3">เป็นทหารหนู
               โดยมีหน้าที่ช่วยกันปกป้องราชาหนูจากอันตราย
-              และสามารถ <b class="text-red-500">ฆ่าราชาหนูของอาณาจักรฝั่งตรงข้าม</b> เพื่อคว้าชัยชนะได้
+              และสามารถ <b class="text-red-500">ฆ่าราชาหนูของฝั่งตรงข้าม</b> เพื่อคว้าชัยชนะได้
             </div>
           </div>
         </article>
@@ -461,6 +463,10 @@ const toggleManaulModal = () => {
               <div>
                 เมื่อหนูเหยียบการ์ดจานจะไม่มีผลใด ๆ และจบตาทันที
                 แต่การ์ดจานที่ว่างอยู่จะสามารถเป็นจุดเรียกทหารหนูตัวใหม่มาเพิ่มจากความสามารถของการ์ดชีสได้
+                <div class="flex items-center gap-6 my-3">
+                  <img src="/plate-1.png" alt="plate-info-1" class="w-36 h-28 rounded-lg">
+                  <img src="/plate-2.png" alt="plate-info-2" class="w-36 rounded-lg">
+                </div>
                 <p>ลิงก์การ์ด: <span class="font-bold">[cheese card]</span></p>
                 <p class="text-purple-600">การ์ดจานมีทั้งหมด 10 ใบ</p>
               </div>
@@ -507,10 +513,16 @@ const toggleManaulModal = () => {
                 การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดกาวดักหนู
                 จะทำให้หนูตัวนั้นอยู่ในสถานะติดอยู่กับที่
                 สถานะมีทั้งหมด 3 สถานะ
-                <div class="grid">
-                  <div>[รูป] ติดกาว</div>
-                  <div>[รูป] พยายามออกจากกาว</div>
-                  <div>[รูป] ออกจากกาวและเดินเกมต่อได้</div>
+                <div class="grid gap-3">
+                  <div class="flex gap-2">
+                    <div class="flex flex-col items-center"><img src="/glue-1.png" alt="glue-state-1"
+                        class="w-28rounded-lg">ติดกาว</div>
+                    <div class="flex flex-col items-center"><img src="/glue-2.png" alt="glue-state-2"
+                        class="w-28 rounded-lg">พยายามออกจากกาว</div>
+                    <div class="flex flex-col items-center"><img src="/glue-3.png" alt="glue-state-3"
+                        class="w-28 rounded-lg">ออกจากกาวและเดินต่อได้
+                    </div>
+                  </div>
                   <p class="text-purple-600">การ์ดกาวมีทั้งหมด 4 ใบ</p>
                 </div>
               </div>
@@ -520,9 +532,9 @@ const toggleManaulModal = () => {
             <div class="bg-slate-50 rounded-lg px-4 py-3">
               <strong class="text-lg">Cat card: การ์ดแมว</strong>
               <div>
-                การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดแมว หนูตัวนั้นจะอยู่ในสถานะ 'ตาย' ทันที
-                [รูป] ทหารหนูตาย และ ราชาหนูตาย
-                <div class="text-red-600">* Warning: ถ้าราชาหนูหนูตาย อาณาจักรนั้น ๆ จะแพ้ทันที !! *</div>
+                การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดแมว หนูตัวนั้นจะอยู่ในสถานะ 'ถูกกำจัด' ทันที
+                [รูป]
+                <div class="text-red-600">* Warning: ถ้าราชาหนูถูกกำจัด ฝ่ายนั้น ๆ จะแพ้ทันที !! *</div>
                 <p class="text-purple-600">การ์ดจานมีทั้งหมด 3 ใบ</p>
               </div>
             </div>
@@ -534,8 +546,13 @@ const toggleManaulModal = () => {
                 การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดสปริง หนูตัวนั้นจะสามารถเดินได้ 2 ครั้ง
                 แต่หนูตัวนั้นจะไม่สามารถกระโดดกลับไปยังสปริงที่เพิ่งเดินผ่านมาได้ (เดินไปและเดินกลับ)
                 แต่ถ้าหากไม่สามารถไปที่การ์ดใด ๆ ได้ สามารถเดินกลับสปริงได้ในกรณีพิเศษ
-                <div class="text-red-600">[รูปถูก] [รูปผิด]</div>
-                <p class="text-purple-600">การ์ดสปริงมีทั้งหมด 7 ใบ</p>
+                <div class="flex">
+                  <div><img src="/spring-2.png" alt="correct" class="w-40 rounded-lg"></div>
+                  <div><img src="/spring-3.png" alt="wrong" class="w-40 rounded-lg"></div>
+                </div>
+                <div class="text-purple-600">
+                  <p>การ์ดสปริงมีทั้งหมด 7 ใบ</p>
+                </div>
               </div>
             </div>
 
@@ -543,11 +560,14 @@ const toggleManaulModal = () => {
             <div class="bg-slate-50 rounded-lg px-4 py-3">
               <strong class="text-lg">Peanut card: การ์ดถั่ว หรือ การ์ดสั่งการ</strong>
               <div>
-                การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดถั่ว หนูตัวนั้นจะทำหน้าที่ <span class="font-">'สั่งการ'</span>
+                การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดถั่ว หนูตัวนั้นจะทำหน้าที่ <span
+                  class="text-red-600">'สั่งการ'</span>
                 เท่านั้น
-                โดยตัวมันจะไม่สามารถเดินได้ในตานั้น แต่จะสามารถสั่งการให้หนูตัวอื่นในฝั่งตัวเองเดินได้ 1 ตา
-                <div class="text-gray-700 italic">แต่ถ้าหาก ไม่มีทหารหนูอยู่ในบนกระดานแล้ว
+                โดยตัวมันจะ<span class="text-red-500">ไม่สามารถเดินได้ในตานั้น</span>
+                แต่จะสามารถสั่งการให้หนูตัวอื่นในฝั่งตัวเองเดินได้ 1 ตา
+                <div class="text-gray-700 italic">แต่ถ้าหากไม่มีทหารหนูอยู่ในบนกระดานแล้ว
                   การ์ดนี้จะถือเป็นการ์ดปกติที่ไม่มีผลใด ๆ ทันที</div>
+                <img src="/peanut-1.png" alt="peanut-info" class="w-40 rounded-lg">
                 <p class="text-purple-600">การ์ดถั่วมีทั้งหมด 6 ใบ</p>
               </div>
             </div>
