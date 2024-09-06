@@ -180,7 +180,6 @@ const triggerCardEvent = (card) => {
     const isHaveSoldier = cards.value.flat().some((c) => c.mouse?.type === 'soldier' && c.mouse?.faction === currentPlayerFaction.value)
 
     if (!isHaveSoldier) return
-    console.log(isHaveSoldier)
 
     selectedMouse.value.isDisabled = true
 
@@ -546,7 +545,7 @@ const toggleManaulModal = () => {
                 การ์ดนี้จะถูกใช้เมื่อหนูเหยียบการ์ดสปริง หนูตัวนั้นจะสามารถเดินได้ 2 ครั้ง
                 แต่หนูตัวนั้นจะไม่สามารถกระโดดกลับไปยังสปริงที่เพิ่งเดินผ่านมาได้ (เดินไปและเดินกลับ)
                 แต่ถ้าหากไม่สามารถไปที่การ์ดใด ๆ ได้ สามารถเดินกลับสปริงได้ในกรณีพิเศษ
-                <div class="flex">
+                <div class="flex gap-4">
                   <div><img src="/spring-2.png" alt="correct" class="w-40 rounded-lg"></div>
                   <div><img src="/spring-3.png" alt="wrong" class="w-40 rounded-lg"></div>
                 </div>
@@ -781,12 +780,12 @@ const toggleManaulModal = () => {
     </div>
     <div class="flex justify-center items-end h-20 text-4xl w-screen text-slate-50 font-sigmar">Cheese
       Kingdom</div>
-    <div class="text-center text-2xl font-bold text-white mb-1">
+    <div class="text-center text-2xl font-bold text-white">
       <!--แสดง turn-->
       Current Player: {{ currentPlayerFaction }}
     </div>
 
-    <div class="h-[calc(100vh-6rem)] grid place-items-center grid-cols-4">
+    <div class="h-[calc(100vh-7rem)] grid place-items-center grid-cols-4">
       <!-- UI mouse display right -->
       <div class="col-start-1 select-none">
         <div class="bg-slate-600 bg-opacity-70 px-4 py-4 flex flex-col items-center rounded-md border-2 border-white"
@@ -814,7 +813,7 @@ const toggleManaulModal = () => {
       <div class="grid grid-cols-1 grid-rows-6 w-fit col-start-2 col-span-2 gap-2 bg-[#E0DFD5] bg-opacity-30">
         <div v-for="(row, idx) in cards" :key="idx" class="grid grid-cols-6 grid-rows-1 gap-2">
           <div v-for="(card) in row" :key="card.id" @click="handleSelectCard(card)"
-            class="ck-card w-[95px] h-[95px] flex items-center justify-center rounded-lg border-2 border-white bg-cover hover:border-green-500"
+            class="ck-card w-[5.5rem] h-[5.5rem] flex items-center justify-center rounded-lg border-2 border-white bg-cover hover:border-green-500"
             :class="[
               !card.isReveal ? 'bg-gray-800' : '',
               card.isReveal && card.type === 'plate' ? 'bg-[url(/plate.png)]' : '',

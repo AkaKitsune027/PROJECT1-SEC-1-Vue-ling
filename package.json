@@ -7,7 +7,8 @@
     "dev": "vite",
     "host": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "serve": "vite build && vite preview"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.15",
