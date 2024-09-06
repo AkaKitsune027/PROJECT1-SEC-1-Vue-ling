@@ -76,7 +76,6 @@ export default class Mouse {
     )
       moves.push(this.card.id + boardSize + 1)
 
-    // console.log(moves)
     return moves
   }
 
