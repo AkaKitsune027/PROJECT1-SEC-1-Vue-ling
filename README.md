@@ -14,7 +14,7 @@
 | 65130500070 | Wanassanan Tri-apibanwongsa     | <li>Peanut card function</li> <li>Gameplay UI</li> <li>Game manual (modal, text)</li> <li>Create image using generative AI</li> <li>Logo</li> <li>Rebase code</li> | 20% |
 | 65130500071 | Woranuch   Naritnet             | <li>Cat card function</li> <li>End game condition</li> <li>Select mouse</li> <li>Count mouse</li> <li>Video editing</li> <li>GitHub decoration</li> <li>Rebase code</li> | 20% |
 | 65130500111 | Pimpajee   Seththirungplop      | <li>Spring card function</li> <li>Homepage UI</li> <li>Path</li> <li>Story modal</li> <li>Subtitle video</li> <li>Rebase code</li> | 20% |
-| 65130500125 | Achmvee    Sanuwong             | <li>Cheese card function</li> <li>Game sound</li> <li>Setup board (card, mouse)</li> <li>Random card</li> <li>Movement</li> <li>Winner modal</li> <li>Rebase code</li> | 20% |
+| 65130500125 | Achmavee    Sanuwong             | <li>Cheese card function</li> <li>Game sound</li> <li>Setup board (card, mouse)</li> <li>Random card</li> <li>Movement</li> <li>Winner modal</li> <li>Rebase code</li> | 20% |
 
 </div>
 <br />
@@ -27,7 +27,12 @@
 ## Game Manual
 <table>
   <tr align='center'>
-    <td><img src="https://github.com/user-attachments/assets/893124f2-66f6-4c8d-ac3a-ac93e149bcaa" width="1400px" /></td>
+    <td>
+      <img src="https://github.com/user-attachments/assets/ddbc35b2-efef-4578-94dc-947cab68d28f" width="1280px" />
+      <p>Home Page</p>
+      <img src="https://github.com/user-attachments/assets/6177c6db-aaac-4897-86ee-16a6a4ca3d19" width="1280px" />
+      <p>Gameplay</p>
+    </td>
     <td>Players can access the game manual to learn how to play and see the card effects by clicking the 'How to Play' button on the home page or the 'i' button during the game.</td>
   </tr>
 </table>
@@ -35,8 +40,8 @@
 ## Game Story
 <table>
   <tr align='center'>
-    <td><img src="https://github.com/user-attachments/assets/87ebd997-0131-4b44-a2fc-211e7da7db3f" width="850px" /></td>
-    <td>When players click the 'Play Game' button, players will see the game story before starting the gameplay.</td>
+    <td><img src="https://github.com/user-attachments/assets/87ebd997-0131-4b44-a2fc-211e7da7db3f" width="800px" /></td>
+    <td>When players click the 'Play Game' button, players will see the game story before starting the game.</td>
   </tr>
 </table>
 
@@ -63,8 +68,11 @@
 
 <h1 align='center'>Game Manual</h1>
 
-[Notion - Game Manual](https://kind-coreopsis-218.notion.site/Cheese-Kingdom-5ba0c08ed3384bff98e221a6163ed64f?pvs=4)
+<div align='center'>
+  
+  [<img src="https://github.com/user-attachments/assets/0fdc3997-9e0a-4e5f-802e-692cf7db754b" width="800px" />](https://kind-coreopsis-218.notion.site/Cheese-Kingdom-5ba0c08ed3384bff98e221a6163ed64f?pvs=4)
 
+</div>
 <br />
 
 ---
@@ -72,6 +80,11 @@
 
 <h1 align='center'>Gameplay</h1>
 
+<div align='center'>
+  
+  [<img src="https://github.com/user-attachments/assets/e13cd2e5-23d6-4b9c-a7d5-81cc182a8a44" width="800px" />](https://drive.google.com/file/d/1PvdQnf5ULgXpgG2WjSmvYz4OZId2Z6ON/view?usp=drive_link)
+
+</div>
 <br />
 
 ---
