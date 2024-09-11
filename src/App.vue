@@ -1,6 +1,6 @@
 <script setup>
 
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 import Mouse from './classes/Mouse.js'
 import Card from './classes/Card.js'
@@ -239,7 +239,6 @@ const handleStuckModalSubmit = () => {
   switchTurn()
 }
 
-let selectMouse
 /**
  * This function is called when a card is clicked.
  * @param {Card} selectedCard - The card that was clicked
